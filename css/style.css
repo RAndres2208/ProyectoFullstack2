@@ -96,3 +96,11 @@ nav a {
     box-sizing: border-box;
     text-align: center;
 }
+
+button {
+    background-color: #4285df;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
