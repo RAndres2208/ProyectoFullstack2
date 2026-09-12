@@ -104,3 +104,16 @@ button {
     padding: 10px 20px;
     cursor: pointer;
 }
+
+.video {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
