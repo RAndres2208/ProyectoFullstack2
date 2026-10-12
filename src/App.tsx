@@ -1,5 +1,6 @@
 import { Route, Router, Switch } from "wouter";
 import { Menu } from "./components/menu/Menu";
+import { Footer } from "./components/footer/Footer";
 import { Home } from "./pages/home/Home";
 import { Products } from "./pages/products/Products";
 import { Cart } from "./pages/cart/Cart";
@@ -18,6 +19,8 @@ function App() {
           <Route path="/carrito" component={Cart} />
           <Route path="/contacto" component={Contact} />
         </Switch>
+
+        <Footer />
       </Router>
     </CartProvider>
   );

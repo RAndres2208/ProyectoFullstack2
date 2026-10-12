@@ -24,10 +24,6 @@ export function Products() {
         </section>
       </main>
 
-      <footer>
-        <p>Robinson Rodriguez</p>
-        <p>Proyecto Fullstack 2026</p>
-      </footer>
     </>
   );
 }
