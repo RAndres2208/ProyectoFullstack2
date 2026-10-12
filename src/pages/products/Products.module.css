@@ -10,15 +10,3 @@
 .planchas {
   width: 100%;
 }
-
-.planchas img {
-  max-width: 100%;
-}
-
-.agregarCarrito {
-  background-color: #4285df;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-}
