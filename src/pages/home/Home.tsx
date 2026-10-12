@@ -23,18 +23,7 @@ export function Home() {
       <main>
         <section className={styles.productos}>
           <section className={styles.planchas}>
-            <h3>Productos Destacados</h3>
-
-            <section className={styles.video}>
-              <video controls>
-                <source
-                  src="/video/relatedvideo.htm"
-                  type="video/mp4"
-                />
-
-                Tu navegador no soporta el elemento de video.
-              </video>
-            </section>
+            <h2>Productos destacados</h2>
 
             {PRODUCTS.map((product) => (
               <CardProduct

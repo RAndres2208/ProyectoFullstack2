@@ -1,4 +1,6 @@
 import styles from "./Products.module.css";
+import { PRODUCTS } from "../../data/products";
+import { CardProduct } from "../../components/card-product/CardProduct";
 
 export function Products() {
   return (
@@ -10,28 +12,14 @@ export function Products() {
       <main>
         <section className={styles.productos}>
           <section className={styles.planchas}>
-            <h3>Productos Disponibles</h3>
+            <h2>Productos disponibles</h2>
 
-            <article>
-              <h4>Plancha 10mm</h4>
-
-              <img
-                src="/imgs/plancha.jfif"
-                alt="Plancha de acero de 10mm"
+            {PRODUCTS.map((product) => (
+              <CardProduct
+                key={product.id}
+                product={product}
               />
-
-              <p>
-                Plancha de 10 milímetros de 1 metro de ancho por 3 metros de
-                largo.
-              </p>
-
-              <button
-                type="button"
-                className={styles.agregarCarrito}
-              >
-                Agregar al carrito
-              </button>
-            </article>
+            ))}
           </section>
         </section>
       </main>
