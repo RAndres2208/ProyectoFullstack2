@@ -1,0 +1,20 @@
+.menu {
+  padding: 1rem;
+}
+
+.menu h1 {
+  margin-bottom: 1rem;
+}
+
+.menu ul {
+  list-style: none;
+  padding: 0;
+}
+
+.menu li {
+  margin-bottom: 0.5rem;
+}
+
+.menu a {
+  text-decoration: none;
+}

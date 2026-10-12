@@ -1,0 +1,45 @@
+.header {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #e9d9d9;
+  border: 3px solid #000000;
+  padding: 8px;
+  text-align: center;
+}
+
+.descripcionHeader {
+  text-align: center;
+}
+
+.productos {
+  background-color: #f5f5f5;
+  padding: 15px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.planchas {
+  width: 100%;
+}
+
+.video {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.video video {
+  width: 100%;
+}
+
+.planchas img {
+  max-width: 100%;
+}
+
+.agregarCarrito {
+  background-color: #4285df;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
