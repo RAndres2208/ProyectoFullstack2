@@ -1,0 +1,64 @@
+.login {
+  max-width: 460px;
+  margin: 24px auto;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #dce3ed;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(20, 38, 62, 0.08);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.subtitle {
+  color: #245caa;
+  font-weight: 700;
+}
+
+.header h1 {
+  margin-bottom: 8px;
+}
+
+.form {
+  margin-top: 0;
+}
+
+.toggle {
+  background: transparent;
+  color: #245caa;
+  padding: 8px 0;
+  margin-top: 4px;
+}
+
+.toggle:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
+.submit {
+  width: 100%;
+  padding: 12px;
+  font-weight: 700;
+}
+
+.message {
+  margin-top: 16px;
+  color: #526175;
+}
+
+.notice {
+  margin: 20px 0 0;
+  font-size: 14px;
+  text-align: center;
+  color: #526175;
+}
+
+@media (max-width: 700px) {
+  .login {
+    margin: 0 auto;
+    padding: 20px;
+  }
+}

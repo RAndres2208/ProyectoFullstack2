@@ -6,8 +6,8 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #222222;
-  background-color: #ffffff;
+  color: #263449;
+  background: #f3f6fa;
 }
 
 body {
@@ -15,11 +15,40 @@ body {
 }
 
 #root {
-  width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 16px;
+  padding: 24px;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.app-content {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #dce3ed;
+  border-radius: 12px;
+  padding: 28px;
+}
+
+h1 {
+  color: #163764;
+  font-size: 32px;
+  margin: 0 0 16px;
+}
+
+h2 {
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+
+p {
+  margin: 0 0 12px;
 }
 
 img {
@@ -27,21 +56,91 @@ img {
   height: auto;
 }
 
-input,
-textarea,
-button {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
 a {
   color: #245caa;
 }
 
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  background: #245caa;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #19477f;
+}
+
+form {
+  max-width: 600px;
+  margin-top: 24px;
+}
+
+form > div {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+input,
+textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #aab8ca;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+  color: #263449;
+}
+
+textarea {
+  resize: vertical;
+}
+
+[aria-invalid="true"] {
+  border-color: #b42318;
+}
+
+p[role="alert"] {
+  color: #b42318;
+  margin-top: 6px;
+}
+
+footer {
+  padding: 24px 0 0;
+  text-align: center;
+  color: #526175;
+  font-size: 14px;
+}
+
 :focus-visible {
-  outline: 2px solid #245caa;
+  outline: 3px solid #b45309;
   outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  #root {
+    padding: 12px;
+  }
+
+  .app-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .app-content {
+    padding: 18px;
+  }
 }

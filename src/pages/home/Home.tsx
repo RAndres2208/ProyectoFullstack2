@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { PRODUCTS } from "../../data/products";
 import { CardProduct } from "../../components/card-product/CardProduct";
 import styles from "./Home.module.css";
@@ -5,36 +6,33 @@ import styles from "./Home.module.css";
 export function Home() {
   return (
     <>
-      <header>
-        <h1 className={styles.header}>Tienda Online</h1>
+      <header className={styles.hero}>
+        <p className={styles.subtitle}>Bienvenido a Tienda Online</p>
 
-        <p>Esta es mi tienda</p>
+        <h1>Explora nuestro catálogo</h1>
 
-        <section className={styles.descripcionHeader}>
-          <h2>Descripción</h2>
+        <p>
+          Consulta los productos disponibles y agrega los que
+          necesitas a tu carrito.
+        </p>
 
-          <p>
-            Es una tienda online que quiere implementar los últimos conceptos
-            de IA.
-          </p>
-        </section>
+        <Link className={styles.action} href="/productos">
+          Ver productos
+        </Link>
       </header>
 
-      <main>
-        <section className={styles.productos}>
-          <section className={styles.planchas}>
-            <h2>Productos destacados</h2>
+      <section className={styles.products}>
+        <h2>Productos destacados</h2>
 
-            {PRODUCTS.map((product) => (
-              <CardProduct
-                key={product.id}
-                product={product}
-              />
-            ))}
-          </section>
-        </section>
-      </main>
-
+        <div className={styles.grid}>
+          {PRODUCTS.map((product) => (
+            <CardProduct
+              key={product.id}
+              product={product}
+            />
+          ))}
+        </div>
+      </section>
     </>
   );
 }
