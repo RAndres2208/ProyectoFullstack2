@@ -8,6 +8,7 @@ import { Contact } from "./pages/contact/Contact";
 import { Dashboard } from "./pages/dashboard/Dashboard";
 import { CartProvider } from "./context/CartProvider";
 import { Login } from "./pages/login/Login";
+import { ProductDetail } from "./pages/product-detail/ProductDetail";
 
 function App() {
   return (
@@ -21,6 +22,13 @@ function App() {
               <Route path="/" component={Home} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/productos" component={Products} />
+
+              <Route path="/productos/:id">
+                {(params) => (
+                  <ProductDetail key={params.id} />
+                )}
+              </Route>
+
               <Route path="/carrito" component={Cart} />
               <Route path="/contacto" component={Contact} />
               <Route path="/login" component={Login} />

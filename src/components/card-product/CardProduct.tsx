@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import type { Product } from "../../data/products";
 import { useCart } from "../../context/CartContext";
 import styles from "./CardProduct.module.css";
@@ -26,6 +27,13 @@ export function CardProduct({ product }: CardProductProps) {
       />
 
       <p>{product.descripcion}</p>
+
+      <Link
+        className={styles.detailLink}
+        href={`/productos/${product.id}`}
+      >
+        Ver detalle
+      </Link>
 
       <button
         type="button"
