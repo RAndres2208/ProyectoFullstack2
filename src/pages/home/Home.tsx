@@ -6,6 +6,11 @@ import styles from "./Home.module.css";
 export function Home() {
   return (
     <>
+      <div className="mb-6 rounded-xl bg-blue-100 p-6">
+        <span className="text-xl font-bold text-blue-900">
+          Tailwind está funcionando
+        </span>
+      </div>
       <header className={styles.hero}>
         <p className={styles.subtitle}>Bienvenido a Tienda Online</p>
 
