@@ -17,9 +17,12 @@ export function ProductDetail() {
     return (
       <section>
         <h1>Producto no encontrado</h1>
+
         <p>No existe un producto con ese identificador.</p>
 
-        <Link href="/productos">Volver al catálogo</Link>
+        <Link className={styles.back} href="/productos">
+          Volver al catálogo
+        </Link>
       </section>
     );
   }
@@ -43,6 +46,15 @@ export function ProductDetail() {
           </p>
 
           <h1>{product.nombre}</h1>
+
+          <div className={styles.tags}>
+            {product.etiquetas.map((etiqueta) => (
+              <span key={etiqueta} className={styles.tag}>
+                {etiqueta}
+              </span>
+            ))}
+          </div>
+
           <p>{product.descripcion}</p>
 
           <button

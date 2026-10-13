@@ -9,3 +9,19 @@
 .detailLink:hover {
   text-decoration: underline;
 }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tag {
+  padding: 4px 10px;
+  background: #eaf1fb;
+  color: #163764;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}

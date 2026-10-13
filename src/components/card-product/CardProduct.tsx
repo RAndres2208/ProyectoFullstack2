@@ -25,7 +25,13 @@ export function CardProduct({ product }: CardProductProps) {
         src={product.imagen}
         alt={product.nombre}
       />
-
+      <div className={styles.tags}>
+        {product.etiquetas.map((etiqueta) => (
+          <span key={etiqueta} className={styles.tag}>
+            {etiqueta}
+          </span>
+        ))}
+      </div>
       <p>{product.descripcion}</p>
 
       <Link
