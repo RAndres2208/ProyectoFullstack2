@@ -1,45 +1,84 @@
+
 import { Link, useLocation } from "wouter";
 import styles from "./Menu.module.css";
 
 const links = [
-  { href: "/", label: "Inicio" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/productos", label: "Productos" },
-  { href: "/carrito", label: "Carrito" },
-  { href: "/contacto", label: "Contacto" },
-  { href: "/login", label: "Iniciar sesión" },
+  { href: "/dashboard", label: "Inicio", icon: "⌂" },
+  { href: "/proyectos", label: "Proyectos", icon: "▤" },
+  { href: "/reportes", label: "Reportes", icon: "▥" },
+  { href: "/perfil", label: "Perfil", icon: "♙" },
 ];
 
 export function Menu() {
   const [location] = useLocation();
 
   return (
-    <nav className={styles.menu} aria-label="Navegación principal">
-      <Link href="/" className={styles.brand}>
-        Tienda Online
-      </Link>
+    <>
+      <aside className={styles.sidebar}>
+        <Link href="/dashboard" className={styles.brand}>
+          <span className={styles.brandIcon}>▣</span>
+          SyncPass
+        </Link>
 
-      <p className={styles.description}>Catálogo y compras</p>
+        <p className={styles.description}>
+          PLATAFORMA INSTITUCIONAL
+        </p>
 
-      <ul className={styles.links}>
-        {links.map((link) => (
-          <li key={link.href}>
+        <nav aria-label="Navegación principal">
+          <ul className={styles.links}>
+            {links.map((link) => {
+              const active = location === link.href;
+
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`${styles.link} ${
+                      active ? styles.active : ""
+                    }`}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <span className={styles.icon}>
+                      {link.icon}
+                    </span>
+                    <span>{link.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className={styles.sidebarFooter}>
+          <strong>Docente · Coordinador</strong>
+          <span>Duoc UC · SyncPass</span>
+        </div>
+      </aside>
+
+      <nav
+        className={styles.mobileNavigation}
+        aria-label="Navegación móvil"
+      >
+        {links.map((link) => {
+          const active = location === link.href;
+
+          return (
             <Link
+              key={link.href}
               href={link.href}
-              className={
-                location === link.href
-                  ? `${styles.link} ${styles.active}`
-                  : styles.link
-              }
-              aria-current={
-                location === link.href ? "page" : undefined
-              }
+              className={`${styles.mobileLink} ${
+                active ? styles.mobileActive : ""
+              }`}
+              aria-current={active ? "page" : undefined}
             >
-              {link.label}
+              <span className={styles.mobileIcon}>
+                {link.icon}
+              </span>
+              <span>{link.label}</span>
             </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+          );
+        })}
+      </nav>
+    </>
   );
 }
