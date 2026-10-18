@@ -631,3 +631,43 @@ a:focus-visible {
   color: #007e79;
   font-weight: 700;
 }
+
+/* Páginas provisionales de SyncPass */
+
+.pending-layout {
+  display: grid;
+  grid-template-columns: 245px minmax(0, 1fr);
+  min-height: 100dvh;
+  background: #f4f7fb;
+}
+
+.pending-content {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 64px 24px 120px;
+}
+
+.pending-content h1 {
+  margin: 0 0 16px;
+  color: #192237;
+  font-size: 30px;
+}
+
+.pending-content p {
+  color: #60728e;
+  line-height: 1.6;
+}
+
+.pending-content a {
+  display: inline-block;
+  margin-top: 24px;
+  color: #00877e;
+  font-weight: 700;
+}
+
+@media (max-width: 899px) {
+  .pending-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

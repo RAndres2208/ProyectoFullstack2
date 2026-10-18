@@ -2,10 +2,10 @@
 import { Link, Route, Switch } from "wouter";
 import { Login } from "./pages/login/Login";
 import { Dashboard } from "./pages/dashboard/Dashboard";
+import { Proyectos } from "./pages/proyectos/Proyectos";
 import { Menu } from "./components/menu/Menu";
 
 const paginasPendientes = [
-  { ruta: "/proyectos", titulo: "Proyectos comunitarios" },
   { ruta: "/reportes", titulo: "Reportes de impacto" },
   { ruta: "/perfil", titulo: "Perfil y preferencias" },
   { ruta: "/participantes", titulo: "Participantes" },
@@ -18,65 +18,33 @@ const paginasPendientes = [
 
 function PaginaPendiente({ titulo }: { titulo: string }) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "minmax(0, 1fr)",
-        minHeight: "100vh",
-        background: "#f4f7fb",
-      }}
-    >
-      <style>
-        {`
-          @media (min-width: 900px) {
-            .pending-layout {
-              grid-template-columns: 245px minmax(0, 1fr) !important;
-            }
-          }
-        `}
-      </style>
+    <div className="pending-layout">
+      <Menu />
 
-      <div
-        className="pending-layout"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr)",
-          minHeight: "100vh",
-        }}
-      >
-        <Menu />
+      <main className="pending-content">
+        <h1>{titulo}</h1>
+        <p>
+          Esta pantalla será implementada siguiendo
+          los mockups de SyncPass.
+        </p>
 
-        <main
-          style={{
-            padding: "64px 24px 120px",
-            maxWidth: "850px",
-            width: "100%",
-            margin: "0 auto",
-          }}
-        >
-          <h1 style={{ fontSize: "30px", marginBottom: "16px" }}>
-            {titulo}
-          </h1>
-
-          <p style={{ color: "#60728e", lineHeight: 1.6 }}>
-            Esta pantalla será implementada siguiendo
-            los mockups de SyncPass.
-          </p>
-
-          <Link
-            href="/dashboard"
-            style={{
-              display: "inline-block",
-              marginTop: "24px",
-              color: "#00877e",
-              fontWeight: 700,
-            }}
-          >
-            ← Volver al panel principal
-          </Link>
-        </main>
-      </div>
+        <Link href="/dashboard">
+          ← Volver al panel principal
+        </Link>
+      </main>
     </div>
+  );
+}
+
+function DetalleProyecto({
+  id,
+}: {
+  id: string;
+}) {
+  return (
+    <PaginaPendiente
+      titulo={`Detalle del proyecto: ${id}`}
+    />
   );
 }
 
@@ -86,6 +54,12 @@ function App() {
       <Route path="/" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
 
+      <Route path="/proyectos" component={Proyectos} />
+
+      <Route path="/proyectos/:id">
+        {(params) => <DetalleProyecto id={params.id} />}
+      </Route>
+
       {paginasPendientes.map((pagina) => (
         <Route key={pagina.ruta} path={pagina.ruta}>
           <PaginaPendiente titulo={pagina.titulo} />
@@ -93,7 +67,7 @@ function App() {
       ))}
 
       <Route>
-        <main style={{ padding: "40px" }}>
+        <main className="pending-content">
           <h1>Página no encontrada</h1>
           <Link href="/dashboard">Volver al inicio</Link>
         </main>

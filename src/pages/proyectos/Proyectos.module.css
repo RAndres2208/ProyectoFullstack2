@@ -1,0 +1,419 @@
+
+/* Estructura principal */
+
+.layout {
+  display: grid;
+  grid-template-columns: 245px minmax(0, 1fr);
+  min-height: 100dvh;
+  background: #f4f7fb;
+  color: #192237;
+}
+
+.workspace {
+  min-width: 0;
+  padding: 28px 38px 70px;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* Encabezado */
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 68px;
+  padding: 0 10px;
+}
+
+.encabezado h1 {
+  flex: 1;
+  margin: 0;
+  color: #192237;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.volver {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 36px;
+  color: #00877e;
+  text-decoration: none;
+  font-size: 29px;
+  flex-shrink: 0;
+}
+
+.menuDecorativo {
+  color: #60728e;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.contenido {
+  padding: 26px 10px 50px;
+}
+
+/* Identificación institucional */
+
+.institucion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.rol {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  background: #ddf6ef;
+  color: #008078;
+  border-radius: 24px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.demo {
+  color: #60728e;
+  font-size: 10px;
+}
+
+/* Buscador */
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 54px;
+  padding: 0 14px;
+  background: #ffffff;
+  border: 1px solid #dce4ed;
+  border-radius: 15px;
+}
+
+.buscador:focus-within {
+  border-color: #00877e;
+  box-shadow: 0 0 0 3px rgba(18, 181, 168, 0.1);
+}
+
+.buscador svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: #60728e;
+}
+
+.buscador input {
+  min-width: 0;
+  flex: 1;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #192237;
+  font-size: 14px;
+}
+
+.buscador input::placeholder {
+  color: #60728e;
+}
+
+/* Filtros */
+
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.filtro {
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 5px;
+  background: #ffffff;
+  border: 1px solid #dce4ed;
+  border-radius: 14px;
+  color: #60728e;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.filtro:hover {
+  border-color: #00877e;
+}
+
+.filtroActivo {
+  border-color: #00877e;
+  background: #ddf6ef;
+  color: #008078;
+  font-weight: 700;
+}
+
+.resumen {
+  margin: 14px 0 12px;
+  color: #60728e;
+  font-size: 12px;
+}
+
+/* Tarjetas */
+
+.lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 8px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #dce4ed;
+  border-radius: 20px;
+  text-decoration: none;
+  color: #192237;
+  transition: border-color 0.2s,
+              transform 0.2s,
+              box-shadow 0.2s;
+}
+
+.tarjeta:hover {
+  transform: translateY(-2px);
+  border-color: #12b5a8;
+  box-shadow: 0 8px 20px rgba(20, 36, 59, 0.07);
+}
+
+.tarjetaEncabezado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconoProyecto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: #00877e;
+  background: #ddf6ef;
+}
+
+.iconoProyecto svg {
+  width: 24px;
+  height: 24px;
+}
+
+.nombreGrupo {
+  flex: 1;
+  min-width: 0;
+}
+
+.nombreGrupo h2 {
+  margin: 0 0 4px;
+  color: #192237;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.nombreGrupo p {
+  margin: 0;
+  color: #60728e;
+  font-size: 11px;
+}
+
+.flecha {
+  color: #60728e;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.ubicacion,
+.fechas {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 12px;
+}
+
+.ubicacion {
+  color: #60728e;
+}
+
+.fechas {
+  color: #192237;
+}
+
+/* Estado y eventos */
+
+.tarjetaPie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 18px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.estadoPunto {
+  width: 8px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.estadoEjecucion {
+  background: #e1f5e9;
+  color: #208451;
+}
+
+.estadoProgramado {
+  background: #ddf6ef;
+  color: #008078;
+}
+
+.estadoFinalizado {
+  background: #f0f2f5;
+  color: #60728e;
+}
+
+.eventos {
+  color: #60728e;
+  font-size: 10px;
+}
+
+/* Estado vacío */
+
+.sinResultados {
+  padding: 45px 20px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 20px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.sinResultados h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.sinResultados p {
+  color: #60728e;
+  font-size: 13px;
+}
+
+.sinResultados button {
+  margin-top: 12px;
+  padding: 11px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #12b5a8;
+  color: #092f38;
+  font-weight: 700;
+}
+
+/* Tablet y celular */
+
+@media (max-width: 899px) {
+  .layout {
+    display: block;
+  }
+
+  .workspace {
+    padding: 0;
+  }
+
+  .encabezado {
+    min-height: 76px;
+    padding: 0 20px;
+  }
+
+  .encabezado h1 {
+    font-size: 20px;
+  }
+
+  .contenido {
+    padding: 18px 20px 120px;
+  }
+
+  .institucion {
+    margin-bottom: 20px;
+  }
+
+  .lista {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .tarjeta {
+    gap: 7px;
+    padding: 13px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .contenedor {
+    max-width: 700px;
+  }
+
+  .contenido {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+@media (max-width: 350px) {
+  .encabezado {
+    gap: 8px;
+    padding: 0 14px;
+  }
+
+  .encabezado h1 {
+    font-size: 18px;
+  }
+
+  .contenido {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .rol {
+    font-size: 10px;
+  }
+
+  .filtro {
+    font-size: 10px;
+  }
+
+  .eventos {
+    font-size: 9px;
+  }
+}
