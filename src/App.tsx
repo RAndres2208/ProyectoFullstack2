@@ -4,6 +4,7 @@ import { Login } from "./pages/login/Login";
 import { Dashboard } from "./pages/dashboard/Dashboard";
 import { Proyectos } from "./pages/proyectos/Proyectos";
 import { Menu } from "./components/menu/Menu";
+import { DetalleEvento } from "./pages/eventos/DetalleEvento";
 
 const paginasPendientes = [
   { ruta: "/reportes", titulo: "Reportes de impacto" },
@@ -13,7 +14,6 @@ const paginasPendientes = [
   { ruta: "/encuestas", titulo: "Encuestas" },
   { ruta: "/offline", titulo: "Modo offline" },
   { ruta: "/historial", titulo: "Historial de sincronización" },
-  { ruta: "/eventos/evt-016", titulo: "Detalle del evento" },
 ];
 
 function PaginaPendiente({ titulo }: { titulo: string }) {
@@ -59,6 +59,11 @@ function App() {
       <Route path="/proyectos/:id">
         {(params) => <DetalleProyecto id={params.id} />}
       </Route>
+
+      <Route
+       path="/eventos/:id"
+       component={DetalleEvento}
+       />
 
       {paginasPendientes.map((pagina) => (
         <Route key={pagina.ruta} path={pagina.ruta}>
