@@ -1,12 +1,15 @@
-
+import { EscanerQR } from "./pages/escaner/EscanerQR";
+import { ConfirmacionAsistencia } from "./pages/escaner/ConfirmacionAsistencia";
 import { Link, Route, Switch } from "wouter";
 import { Login } from "./pages/login/Login";
 import { Dashboard } from "./pages/dashboard/Dashboard";
 import { Proyectos } from "./pages/proyectos/Proyectos";
 import { Menu } from "./components/menu/Menu";
 import { DetalleEvento } from "./pages/eventos/DetalleEvento";
+import { ModoOffline } from "./pages/offline/ModoOffline";
 
 const paginasPendientes = [
+  { ruta: "/offline", titulo: "Modo offline" },
   { ruta: "/reportes", titulo: "Reportes de impacto" },
   { ruta: "/perfil", titulo: "Perfil y preferencias" },
   { ruta: "/participantes", titulo: "Participantes" },
@@ -56,14 +59,21 @@ function App() {
 
       <Route path="/proyectos" component={Proyectos} />
 
+      <Route path="/offline" component={ModoOffline} />
+      <Route path="/escaner" component={EscanerQR} />
+
+      <Route
+        path="/asistencia/confirmacion/:id"
+        component={ConfirmacionAsistencia}
+      />
       <Route path="/proyectos/:id">
         {(params) => <DetalleProyecto id={params.id} />}
       </Route>
 
       <Route
-       path="/eventos/:id"
-       component={DetalleEvento}
-       />
+        path="/eventos/:id"
+        component={DetalleEvento}
+      />
 
       {paginasPendientes.map((pagina) => (
         <Route key={pagina.ruta} path={pagina.ruta}>
