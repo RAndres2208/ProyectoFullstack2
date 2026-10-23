@@ -16,7 +16,7 @@ const cognitoAuthConfig: AuthProviderProps = {
 
   redirect_uri:
     import.meta.env.VITE_OIDC_REDIRECT_URI ??
-    'https://proyectofullstack-iota.vercel.app',
+    'https://proyectofullstack-iota.vercel.app/',
 
   response_type: 'code',
   scope: 'email openid phone',

@@ -7,6 +7,8 @@ import { Proyectos } from "./pages/proyectos/Proyectos";
 import { Menu } from "./components/menu/Menu";
 import { DetalleEvento } from "./pages/eventos/DetalleEvento";
 import { ModoOffline } from "./pages/offline/ModoOffline";
+import { useAuth } from "react-oidc-context";
+
 
 const paginasPendientes = [
   { ruta: "/offline", titulo: "Modo offline" },
@@ -51,7 +53,23 @@ function DetalleProyecto({
   );
 }
 
+
+
 function App() {
+
+  const auth = useAuth();
+
+  if (auth.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (auth.error) {
+    return <div>Encountering error... {auth.error.message}</div>;
+  }
+
+
+
+  
   return (
     <Switch>
       <Route path="/" component={Login} />

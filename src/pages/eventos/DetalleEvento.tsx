@@ -188,7 +188,7 @@ export function DetalleEvento() {
             </section>
 
             <Link
-              href="/participantes"
+              href="/escaner"
               className={styles.botonAsistencia}
             >
               <Icono tipo="qr" size={23} />
