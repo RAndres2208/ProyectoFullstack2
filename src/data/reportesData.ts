@@ -1,0 +1,191 @@
+/**
+ * Registros de demostración para el panel de reportes.
+ * Las fechas, inscripciones y asistencias son coherentes entre sí,
+ * pero no representan información histórica real del backend.
+ */
+
+export type EventoReporte = {
+  id: string;
+  fecha: string;
+  proyectoId: string;
+  proyectoNombre: string;
+  nombre: string;
+  inscritos: number;
+  asistentes: number;
+  encuestas: number;
+  demostracion: true;
+};
+
+export const eventosReporteDemo: EventoReporte[] = [
+  {
+    id: "rep-001",
+    fecha: "2026-02-18",
+    proyectoId: "conecta-barrio",
+    proyectoNombre: "Conecta Barrio",
+    nombre: "Taller de smartphones",
+    inscritos: 28,
+    asistentes: 24,
+    encuestas: 18,
+    demostracion: true,
+  },
+  {
+    id: "rep-002",
+    fecha: "2026-03-05",
+    proyectoId: "semillas-comunidad",
+    proyectoNombre: "Semillas de comunidad",
+    nombre: "Huerto urbano",
+    inscritos: 22,
+    asistentes: 18,
+    encuestas: 14,
+    demostracion: true,
+  },
+  {
+    id: "rep-003",
+    fecha: "2026-03-19",
+    proyectoId: "barrio-movimiento",
+    proyectoNombre: "Barrio en movimiento",
+    nombre: "Caminata saludable",
+    inscritos: 26,
+    asistentes: 21,
+    encuestas: 15,
+    demostracion: true,
+  },
+  {
+    id: "rep-004",
+    fecha: "2026-04-11",
+    proyectoId: "conecta-barrio",
+    proyectoNombre: "Conecta Barrio",
+    nombre: "Trámites en línea",
+    inscritos: 30,
+    asistentes: 25,
+    encuestas: 20,
+    demostracion: true,
+  },
+  {
+    id: "rep-005",
+    fecha: "2026-04-25",
+    proyectoId: "semillas-comunidad",
+    proyectoNombre: "Semillas de comunidad",
+    nombre: "Compostaje domiciliario",
+    inscritos: 20,
+    asistentes: 16,
+    encuestas: 12,
+    demostracion: true,
+  },
+  {
+    id: "rep-006",
+    fecha: "2026-05-09",
+    proyectoId: "barrio-movimiento",
+    proyectoNombre: "Barrio en movimiento",
+    nombre: "Yoga comunitario",
+    inscritos: 24,
+    asistentes: 19,
+    encuestas: 14,
+    demostracion: true,
+  },
+  {
+    id: "rep-007",
+    fecha: "2026-05-23",
+    proyectoId: "conecta-barrio",
+    proyectoNombre: "Conecta Barrio",
+    nombre: "Seguridad digital",
+    inscritos: 32,
+    asistentes: 27,
+    encuestas: 22,
+    demostracion: true,
+  },
+  {
+    id: "rep-008",
+    fecha: "2026-06-13",
+    proyectoId: "semillas-comunidad",
+    proyectoNombre: "Semillas de comunidad",
+    nombre: "Vivero comunitario",
+    inscritos: 18,
+    asistentes: 15,
+    encuestas: 11,
+    demostracion: true,
+  },
+  {
+    id: "rep-009",
+    fecha: "2026-07-18",
+    proyectoId: "barrio-movimiento",
+    proyectoNombre: "Barrio en movimiento",
+    nombre: "Baile entretenido",
+    inscritos: 24,
+    asistentes: 20,
+    encuestas: 13,
+    demostracion: true,
+  },
+  {
+    id: "rep-010",
+    fecha: "2026-08-08",
+    proyectoId: "conecta-barrio",
+    proyectoNombre: "Conecta Barrio",
+    nombre: "Comunicación por video",
+    inscritos: 26,
+    asistentes: 21,
+    encuestas: 16,
+    demostracion: true,
+  },
+  {
+    id: "rep-011",
+    fecha: "2026-08-22",
+    proyectoId: "semillas-comunidad",
+    proyectoNombre: "Semillas de comunidad",
+    nombre: "Feria de semillas",
+    inscritos: 22,
+    asistentes: 17,
+    encuestas: 12,
+    demostracion: true,
+  },
+  {
+    id: "rep-012",
+    fecha: "2026-09-12",
+    proyectoId: "conecta-barrio",
+    proyectoNombre: "Conecta Barrio",
+    nombre: "Alfabetización digital",
+    inscritos: 32,
+    asistentes: 24,
+    encuestas: 19,
+    demostracion: true,
+  },
+  {
+    id: "rep-013",
+    fecha: "2026-09-26",
+    proyectoId: "barrio-movimiento",
+    proyectoNombre: "Barrio en movimiento",
+    nombre: "Cierre de invierno",
+    inscritos: 26,
+    asistentes: 20,
+    encuestas: 15,
+    demostracion: true,
+  },
+  {
+    id: "rep-014",
+    fecha: "2026-10-16",
+    proyectoId: "conecta-barrio",
+    proyectoNombre: "Conecta Barrio",
+    nombre: "Alfabetización digital II",
+    inscritos: 32,
+    asistentes: 24,
+    encuestas: 18,
+    demostracion: true,
+  },
+  {
+    id: "rep-015",
+    fecha: "2026-10-20",
+    proyectoId: "semillas-comunidad",
+    proyectoNombre: "Semillas de comunidad",
+    nombre: "Huerto comunitario",
+    inscritos: 22,
+    asistentes: 17,
+    encuestas: 13,
+    demostracion: true,
+  },
+];
+
+export const proyectosReporteDemo = [
+  { id: "conecta-barrio", nombre: "Conecta Barrio" },
+  { id: "semillas-comunidad", nombre: "Semillas de comunidad" },
+  { id: "barrio-movimiento", nombre: "Barrio en movimiento" },
+];

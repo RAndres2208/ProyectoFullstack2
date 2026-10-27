@@ -1,0 +1,226 @@
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  margin-bottom: 18px;
+  background: var(--color-brand-dark);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-inverse);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  border: 1px solid rgba(181, 139, 85, 0.45);
+  border-radius: var(--radius-md);
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.identidad {
+  flex: 1;
+  min-width: 0;
+}
+
+.identidad h2 {
+  margin: 0 0 4px;
+  color: var(--color-text-inverse);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.identidad p {
+  margin: 0;
+  color: var(--color-text-inverse-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.estadoFila {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.estadoFila span:last-child {
+  color: var(--color-text-inverse-muted);
+}
+
+.accionesSesion {
+  flex-shrink: 0;
+}
+
+.paneles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.listaDatos {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.listaDatos > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.4fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.listaDatos > div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.listaDatos dt {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.listaDatos dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.identificador {
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 12px !important;
+  word-break: break-all;
+}
+
+.detallesTecnicos {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.detallesTecnicos summary {
+  color: var(--color-brand-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.detallesTecnicos summary:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.detallesTecnicos dl {
+  margin: 12px 0 0;
+}
+
+.detallesTecnicos dl > div {
+  padding: 9px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.detallesTecnicos dl > div:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.detallesTecnicos dt {
+  margin-bottom: 3px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.detallesTecnicos dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.cierre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cierre h3 {
+  margin: 0 0 4px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.cierre p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.alternativa {
+  margin-bottom: 14px;
+}
+
+@media (max-width: 960px) {
+  .paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .hero {
+    flex-wrap: wrap;
+    gap: 13px;
+    padding: 16px;
+  }
+
+  .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    font-size: 20px;
+  }
+
+  .identidad h2 {
+    font-size: 21px;
+  }
+
+  .accionesSesion {
+    width: 100%;
+  }
+
+  .accionesSesion button {
+    width: 100%;
+  }
+
+  .listaDatos > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+  }
+}

@@ -12,6 +12,19 @@ dist
 dist-ssr
 *.local
 
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# Subproyecto de pruebas ajeno al frontend principal
+consume-api/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

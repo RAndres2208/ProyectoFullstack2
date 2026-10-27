@@ -1,7 +1,49 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.card h4 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.agregarCarrito {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 10px 16px;
+  border: 1px solid var(--color-brand-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-base);
+}
+
+.agregarCarrito:hover {
+  background: var(--color-brand-primary-hover);
+}
+
+.agregarCarrito:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 .detailLink {
   display: inline-block;
   margin-bottom: 16px;
-  color: #245caa;
+  color: var(--color-brand-primary);
   font-weight: 700;
   text-decoration: none;
 }
@@ -19,8 +61,8 @@
 
 .tag {
   padding: 4px 10px;
-  background: #eaf1fb;
-  color: #163764;
+  background: var(--color-surface-muted);
+  color: var(--color-text-primary);
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;

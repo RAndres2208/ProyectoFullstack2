@@ -1,11 +1,16 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "react-oidc-context";
 import { Link } from "wouter";
 import { Menu } from "../../components/menu/Menu";
 import {
   proyectosData,
   type Proyecto,
 } from "../../data/proyectosData";
+import {
+  obtenerProyectosApi,
+  type ProyectoApi,
+} from "../../services/proyectosApi";
 import styles from "./Proyectos.module.css";
 
 type Filtro = "Todos" | "En ejecución" | "Finalizados";
@@ -23,10 +28,15 @@ function IconoProyecto({
 }) {
   if (tipo === "computador") {
     return (
-      <svg viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2"
-        strokeLinecap="round" strokeLinejoin="round"
-        aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
         <rect x="4" y="4" width="16" height="12" rx="2" />
         <path d="M2 20h20l-2-4H4l-2 4Z" />
       </svg>
@@ -35,10 +45,15 @@ function IconoProyecto({
 
   if (tipo === "planta") {
     return (
-      <svg viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2"
-        strokeLinecap="round" strokeLinejoin="round"
-        aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
         <path d="M12 21V11" />
         <path d="M12 16c-5 0-8-3-8-8 5 0 8 3 8 8Z" />
         <path d="M12 12c0-5 3-8 8-8 0 5-3 8-8 8Z" />
@@ -48,10 +63,15 @@ function IconoProyecto({
   }
 
   return (
-    <svg viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2"
-      strokeLinecap="round" strokeLinejoin="round"
-      aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M20.5 5.5a5.5 5.5 0 0 0-8.5-.6 5.5 5.5 0 0 0-8.5.6c-3 4 0 8 8.5 15 8.5-7 11.5-11 8.5-15Z" />
       <path d="M3 12h5l2-3 3 7 2-4h6" />
     </svg>
@@ -60,9 +80,14 @@ function IconoProyecto({
 
 function IconoBuscar() {
   return (
-    <svg viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2"
-      strokeLinecap="round" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
       <circle cx="10.5" cy="10.5" r="6.5" />
       <path d="m16 16 5 5" />
     </svg>
@@ -112,7 +137,10 @@ function TarjetaProyecto({
 
       <div className={styles.tarjetaPie}>
         <span className={`${styles.estado} ${estadoClase}`}>
-          <span className={styles.estadoPunto} aria-hidden="true" />
+          <span
+            className={styles.estadoPunto}
+            aria-hidden="true"
+          />
           {proyecto.estado}
         </span>
 
@@ -125,9 +153,72 @@ function TarjetaProyecto({
 }
 
 export function Proyectos() {
+  const auth = useAuth();
+  const accessToken = auth.user?.access_token;
+
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState<Filtro>("Todos");
 
+  // Datos recibidos desde nuestro backend Spring Boot.
+  const [proyectosApi, setProyectosApi] = useState<ProyectoApi[]>([]);
+  const [mensajeApi, setMensajeApi] = useState("");
+  const [cargandoApi, setCargandoApi] = useState(true);
+
+  const autenticado = auth.isAuthenticated && Boolean(accessToken);
+
+  // Consultar el backend usando el access token de Cognito.
+  useEffect(() => {
+    if (!autenticado || !accessToken) {
+      return;
+    }
+
+    let cancelado = false;
+
+    async function cargarProyectos() {
+      try {
+        const proyectos = await obtenerProyectosApi(accessToken!);
+
+        if (cancelado) {
+          return;
+        }
+
+        setProyectosApi(proyectos);
+        setMensajeApi("Conexión exitosa con Spring Boot");
+      } catch (error) {
+        if (cancelado) {
+          return;
+        }
+
+        setProyectosApi([]);
+        setMensajeApi(
+          error instanceof Error
+            ? error.message
+            : "No fue posible conectar con la API"
+        );
+      } finally {
+        if (!cancelado) {
+          setCargandoApi(false);
+        }
+      }
+    }
+
+    void cargarProyectos();
+
+    return () => {
+      cancelado = true;
+    };
+  }, [accessToken, autenticado]);
+
+  const estadoApi = !autenticado
+    ? auth.isLoading
+      ? "Comprobando sesión de Cognito..."
+      : "No hay una sesión autenticada disponible"
+    : mensajeApi || "Conectando con Spring Boot...";
+
+  const cargando = autenticado && cargandoApi;
+  const proyectosApiVisibles = autenticado ? proyectosApi : [];
+
+  // Conservamos los proyectos originales del diseño.
   const proyectosFiltrados = useMemo(() => {
     const normalizar = (texto: string) =>
       texto
@@ -179,8 +270,12 @@ export function Proyectos() {
 
             <h1>Proyectos comunitarios</h1>
 
-            <span className={styles.menuDecorativo}
-              aria-hidden="true">⋮</span>
+            <span
+              className={styles.menuDecorativo}
+              aria-hidden="true"
+            >
+              ⋮
+            </span>
           </header>
 
           <main className={styles.contenido}>
@@ -188,13 +283,45 @@ export function Proyectos() {
               <span className={styles.rol}>
                 ◈ Docente · Coordinador
               </span>
+
               <span className={styles.demo}>
                 DUOC UC · DEMO
               </span>
             </div>
 
+            {/* Estado de conexión con la API */}
+            <section
+              role="status"
+              aria-live="polite"
+              className={styles.estadoApi}
+            >
+              <strong>Conexión con SyncPass API</strong>
+
+              <p>Estado: {estadoApi}</p>
+
+              <p>
+                Proyectos recibidos desde Spring Boot:{" "}
+                {proyectosApiVisibles.length}
+              </p>
+
+              {cargando && (
+                <p>Consultando información...</p>
+              )}
+
+              {proyectosApiVisibles.length > 0 && (
+                <ul>
+                  {proyectosApiVisibles.map((proyecto) => (
+                    <li key={proyecto.id}>
+                      {proyecto.nombre} — {proyecto.estado}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
             <div className={styles.buscador}>
               <IconoBuscar />
+
               <input
                 type="search"
                 value={busqueda}
@@ -251,9 +378,11 @@ export function Proyectos() {
             ) : (
               <div className={styles.sinResultados}>
                 <h2>No encontramos proyectos</h2>
+
                 <p>
                   Prueba con otro término o cambia el filtro.
                 </p>
+
                 <button
                   type="button"
                   onClick={() => {

@@ -1,0 +1,144 @@
+.avisoRango {
+  margin-top: 10px;
+}
+
+.avisoRango > div {
+  margin-bottom: 0;
+}
+
+.paneles {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.resultados {
+  margin-top: 14px;
+}
+
+.figura {
+  margin: 0;
+}
+
+.grafico {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(34px, 1fr));
+  align-items: end;
+  gap: 8px;
+  min-height: 190px;
+  padding: 12px 4px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.barras {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  height: 150px;
+}
+
+.barraInscritos,
+.barraAsistentes {
+  display: block;
+  width: 9px;
+  max-width: 32%;
+  min-height: 3px;
+  border-radius: 5px 5px 2px 2px;
+}
+
+.barraInscritos {
+  background: var(--color-chart-highlight);
+}
+
+.barraAsistentes {
+  background: var(--color-chart-accent);
+}
+
+.mes {
+  width: 100%;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.leyenda {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 13px;
+  margin-top: 14px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.leyenda > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.puntoInscritos,
+.puntoAsistentes {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.puntoInscritos {
+  background: var(--color-chart-highlight);
+}
+
+.puntoAsistentes {
+  background: var(--color-chart-accent);
+}
+
+.leyendaNota {
+  margin-left: auto;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 1100px) {
+  .paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 430px) {
+  .grafico {
+    grid-template-columns: repeat(auto-fit, minmax(27px, 1fr));
+    gap: 4px;
+    min-height: 165px;
+  }
+
+  .barras {
+    height: 126px;
+    gap: 2px;
+  }
+
+  .barraInscritos,
+  .barraAsistentes {
+    width: 7px;
+  }
+
+  .mes {
+    font-size: 12px;
+  }
+
+  .leyendaNota {
+    margin-left: 0;
+    width: 100%;
+  }
+}

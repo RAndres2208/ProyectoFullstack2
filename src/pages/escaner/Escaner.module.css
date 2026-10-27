@@ -1,10 +1,10 @@
 
 .layout {
   display: grid;
-  grid-template-columns: 245px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   min-height: 100dvh;
-  background: #f4f7fb;
-  color: #192237;
+  background: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 .workspace {
@@ -32,13 +32,13 @@
 }
 
 .volver {
-  color: #00877e;
+  color: var(--color-brand-primary);
   font-size: 29px;
   text-decoration: none;
 }
 
 .encabezado > span {
-  color: #60728e;
+  color: var(--color-text-secondary);
   font-size: 24px;
 }
 
@@ -59,15 +59,15 @@
 .rol {
   padding: 6px 11px;
   border-radius: 22px;
-  background: #ddf6ef;
-  color: #007e79;
-  font-size: 11px;
+  background: var(--color-brand-accent-soft);
+  color: var(--color-brand-primary);
+  font-size: 12px;
   font-weight: 700;
 }
 
 .demo {
-  color: #60728e;
-  font-size: 10px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
 }
 
 .eventoInfo h2 {
@@ -82,15 +82,15 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 9px;
-  color: #60728e;
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 
 .offline {
   padding: 7px 11px;
   border-radius: 22px;
-  background: #fff0cc;
-  color: #a36a00;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
   font-weight: 700;
 }
 
@@ -102,13 +102,15 @@
   width: 100%;
   aspect-ratio: 353 / 305;
   overflow: hidden;
-  border-radius: 24px;
-  background: #101c2c;
-  transition: background 0.2s ease;
+  border: 1px solid rgba(181, 139, 85, 0.35);
+  border-radius: var(--radius-lg);
+  background: var(--color-brand-dark);
+  box-shadow: inset 0 0 0 1px rgba(181, 139, 85, 0.08);
+  transition: background var(--transition-base);
 }
 
 .camaraIluminada {
-  background: #29445a;
+  background: var(--color-sidebar-hover);
 }
 
 .camaraEtiqueta {
@@ -116,11 +118,13 @@
   top: 15px;
   left: 16px;
   z-index: 2;
-  padding: 6px 9px;
+  padding: 6px 10px;
+  border: 1px solid rgba(181, 139, 85, 0.28);
   border-radius: 6px;
-  background: #263b50;
-  color: #e3edf7;
-  font-size: 10px;
+  background: rgba(42, 20, 35, 0.72);
+  color: var(--color-text-inverse-muted);
+  font-size: 12px;
+  letter-spacing: 0.2px;
 }
 
 .lineaHorizontal,
@@ -155,9 +159,10 @@
   position: absolute;
   width: 44px;
   height: 44px;
-  border-color: #12b5a8;
+  border-color: var(--color-brand-accent);
   border-style: solid;
   border-width: 0;
+  filter: drop-shadow(0 0 6px rgba(181, 139, 85, 0.35));
 }
 
 .esquinaSuperiorIzquierda {
@@ -198,18 +203,31 @@
   justify-content: center;
   width: 50px;
   height: 50px;
-  border: 0;
+  border: 1px solid rgba(181, 139, 85, 0.45);
   border-radius: 50%;
-  background: #263b50;
-  color: white;
+  background: rgba(42, 20, 35, 0.72);
+  color: var(--color-brand-accent);
   font-size: 24px;
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.linterna:hover {
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-accent);
+}
+
+.linterna:focus-visible {
+  outline: 3px solid var(--color-focus-inverse);
+  outline-offset: 2px;
 }
 
 .instruccion {
   margin: 14px 0;
   text-align: center;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* Avisos */
@@ -218,10 +236,11 @@
   display: flex;
   gap: 12px;
   margin-top: 12px;
-  padding: 15px 13px;
-  border-radius: 16px;
-  background: #fff0cc;
-  color: #a36a00;
+  padding: 15px 14px;
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .avisoIcono {
@@ -250,52 +269,78 @@
   justify-content: center;
   width: 100%;
   min-height: 53px;
-  padding: 12px;
-  border-radius: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
   text-align: center;
   text-decoration: none;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base);
 }
 
 .botonSecundario {
   margin-top: 12px;
-  border: 1px solid #dce4ed;
-  background: #ffffff;
-  color: #192237;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
 }
 
 .botonPrincipal {
   margin-top: 12px;
-  border: none;
-  background: #12b5a8;
-  color: #092f38;
+  border: 1px solid var(--color-brand-primary);
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
 }
 
-.botonPrincipal:hover {
-  background: #08a99e;
+.botonPrincipal:hover:not(:disabled) {
+  background: var(--color-brand-primary-hover);
+  border-color: var(--color-brand-primary-hover);
 }
 
-.botonSecundario:hover {
-  background: #f1fffc;
+.botonSecundario:hover:not(:disabled) {
+  background: var(--color-brand-accent-soft);
+  border-color: var(--color-brand-accent);
+  color: var(--color-brand-primary);
+}
+
+.botonPrincipal:focus-visible,
+.botonSecundario:focus-visible,
+.enlaceDemo:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.botonPrincipal:disabled,
+.botonSecundario:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .enlaceDemo {
   display: block;
   margin: 13px auto;
-  padding: 7px;
+  padding: 7px 10px;
   border: 0;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: #00877e;
+  color: var(--color-brand-primary);
   font-size: 12px;
   font-weight: 700;
 }
 
+.enlaceDemo:hover {
+  background: var(--color-brand-accent-soft);
+  text-decoration: underline;
+}
+
 .nota {
   margin: 14px 0;
-  color: #60728e;
-  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
   text-align: center;
 }
 
@@ -307,12 +352,13 @@
   gap: 8px;
   margin-top: 14px;
   padding: 16px;
-  border: 1px solid #dce4ed;
-  border-radius: 16px;
-  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 }
 
 .formulario label {
+  color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 700;
 }
@@ -320,11 +366,22 @@
 .formulario input {
   width: 100%;
   height: 49px;
-  border: 1px solid #dce4ed;
-  border-radius: 11px;
   padding: 0 13px;
-  background: white;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   font-size: 14px;
+}
+
+.formulario input:focus {
+  border-color: var(--color-brand-accent-strong);
+  box-shadow: 0 0 0 3px rgba(181, 139, 85, 0.2);
+  outline: none;
+}
+
+.formulario input[aria-invalid="true"] {
+  border-color: var(--color-danger);
 }
 
 .formulario .botonPrincipal {
@@ -333,7 +390,7 @@
 
 .error {
   margin: 0;
-  color: #b42318;
+  color: var(--color-danger);
   font-size: 12px;
 }
 
@@ -352,28 +409,30 @@
   height: 80px;
   margin: 0 auto 18px;
   border-radius: 50%;
-  background: #e1f5e9;
-  color: #208451;
+  background: var(--color-success-bg);
+  color: var(--color-success);
   font-size: 38px;
 }
 
 .confirmacion h2 {
   margin: 0 0 12px;
+  font-family: var(--font-display);
   font-size: 25px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .confirmacion p {
   margin: 0;
-  color: #60728e;
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
 .comprobante {
   padding: 16px;
-  border: 1px solid #dce4ed;
-  border-radius: 21px;
-  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .comprobanteEncabezado {
@@ -391,9 +450,9 @@
 .validado {
   padding: 7px 10px;
   border-radius: 22px;
-  background: #e1f5e9;
-  color: #208451;
-  font-size: 11px;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -401,17 +460,18 @@
 .comprobanteSeparador {
   height: 1px;
   margin: 15px 0;
-  background: #dce4ed;
+  background: var(--color-border);
 }
 
 .comprobante h3 {
   margin: 0 0 13px;
-  font-size: 16px;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .textoSuave {
-  color: #60728e;
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 
@@ -473,6 +533,6 @@
   }
 
   .validado {
-    font-size: 10px;
+    font-size: 12px;
   }
 }

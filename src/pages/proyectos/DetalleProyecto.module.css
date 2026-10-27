@@ -1,0 +1,259 @@
+.estadoVacio {
+  margin-top: 14px;
+}
+
+.reintento {
+  margin-bottom: 14px;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 22px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(181, 139, 85, 0.28);
+  border-radius: var(--radius-lg);
+  background: var(--color-brand-dark);
+  color: var(--color-text-inverse);
+}
+
+.heroPrincipal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.heroIcono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border: 1px solid rgba(181, 139, 85, 0.45);
+  border-radius: var(--radius-md);
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.heroTexto {
+  min-width: 0;
+}
+
+.heroEtiquetas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.heroTexto h2 {
+  margin: 0 0 4px;
+  color: var(--color-text-inverse);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.heroTexto p {
+  margin: 0;
+  color: var(--color-text-inverse-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.heroEstado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.heroEstado > span {
+  color: var(--color-text-inverse-muted);
+}
+
+/* Paneles */
+
+.paneles {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.descripcion {
+  margin: 0 0 14px;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.datosDemo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.datosDemo > div {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.datosDemo dt {
+  margin-bottom: 3px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.datosDemo dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.subtitulo {
+  margin: 16px 0 7px;
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.objetivos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sinDatos {
+  padding: 15px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.sinDatos p:first-child {
+  margin-top: 0;
+}
+
+.sinDatos p:last-child {
+  margin-bottom: 0;
+}
+
+/* Indicadores demo */
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.indicadores > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+}
+
+.indicadores strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.indicadores span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.apiDestacado {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.apiDestacado strong {
+  color: var(--color-brand-primary);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.panelEventos {
+  margin-top: 14px;
+}
+
+@media (max-width: 960px) {
+  .paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .hero {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .heroIcono {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    font-size: 22px;
+  }
+
+  .heroTexto h2 {
+    font-size: 21px;
+  }
+
+  .heroEstado {
+    width: 100%;
+  }
+
+  .datosDemo,
+  .indicadores {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 380px) {
+  .heroPrincipal {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .heroTexto h2 {
+    font-size: 19px;
+  }
+}

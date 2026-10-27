@@ -2,10 +2,10 @@
   max-width: 460px;
   margin: 24px auto;
   padding: 32px;
-  background: #ffffff;
-  border: 1px solid #dce3ed;
-  border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(20, 38, 62, 0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .header {
@@ -14,7 +14,7 @@
 }
 
 .subtitle {
-  color: #245caa;
+  color: var(--color-brand-primary);
   font-weight: 700;
 }
 
@@ -28,7 +28,7 @@
 
 .toggle {
   background: transparent;
-  color: #245caa;
+  color: var(--color-brand-primary);
   padding: 8px 0;
   margin-top: 4px;
 }
@@ -46,14 +46,14 @@
 
 .message {
   margin-top: 16px;
-  color: #526175;
+  color: var(--color-text-secondary);
 }
 
 .notice {
   margin: 20px 0 0;
   font-size: 14px;
   text-align: center;
-  color: #526175;
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 700px) {

@@ -1,7 +1,7 @@
 .hero {
   padding: 32px;
   border-radius: 12px;
-  background: #eaf1fb;
+  background: var(--color-surface-muted);
   margin-bottom: 32px;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .subtitle {
-  color: #245caa;
+  color: var(--color-brand-primary);
   font-weight: 700;
 }
 
@@ -24,14 +24,14 @@
   margin-top: 12px;
   padding: 12px 20px;
   border-radius: 8px;
-  background: #245caa;
-  color: #ffffff;
+  background: var(--color-brand-primary);
+  color: var(--color-surface);
   font-weight: 700;
   text-decoration: none;
 }
 
 .action:hover {
-  background: #19477f;
+  background: var(--color-brand-primary);
 }
 
 .products h2 {

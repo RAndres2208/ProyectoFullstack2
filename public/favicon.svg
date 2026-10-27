@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="titulo">
+  <title id="titulo">SyncPass · Plataforma de Gestión Comunitaria</title>
+  <rect width="32" height="32" rx="7" fill="#2A1423" />
+  <rect x="1" y="1" width="30" height="30" rx="6" fill="none" stroke="#B58B55" stroke-opacity="0.55" />
+  <path d="M16 5 25 9v6.4c0 5.3-3.8 8.5-9 10.6-5.2-2.1-9-5.3-9-10.6V9l9-4Z" fill="none" stroke="#B58B55" stroke-width="1.7" stroke-linejoin="round" />
+  <path d="m11.4 16.2 3 3 6.2-6.6" fill="none" stroke="#F5F0E8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -5,70 +5,67 @@ import { Link, Route, Switch, Redirect } from "wouter";
 import { Login } from "./pages/login/Login";
 import { Dashboard } from "./pages/dashboard/Dashboard";
 import { Proyectos } from "./pages/proyectos/Proyectos";
-import { Menu } from "./components/menu/Menu";
+import { DetalleProyecto } from "./pages/proyectos/DetalleProyecto";
 import { DetalleEvento } from "./pages/eventos/DetalleEvento";
 import { ModoOffline } from "./pages/offline/ModoOffline";
+import { Participantes } from "./pages/participantes/Participantes";
+import { Reportes } from "./pages/reportes/Reportes";
+import { Perfil } from "./pages/perfil/Perfil";
+import { Quorum } from "./pages/quorum/Quorum";
+import { Encuestas } from "./pages/encuestas/Encuestas";
+import { Historial } from "./pages/historial/Historial";
 import { useAuth } from "react-oidc-context";
-
-const paginasPendientes = [
-  { ruta: "/reportes", titulo: "Reportes de impacto" },
-  { ruta: "/perfil", titulo: "Perfil y preferencias" },
-  { ruta: "/participantes", titulo: "Participantes" },
-  { ruta: "/quorum", titulo: "Control de quórum" },
-  { ruta: "/encuestas", titulo: "Encuestas" },
-  { ruta: "/historial", titulo: "Historial de sincronización" },
-];
-
-function PaginaPendiente({ titulo }: { titulo: string }) {
-  return (
-    <div className="pending-layout">
-      <Menu />
-
-      <main className="pending-content">
-        <h1>{titulo}</h1>
-
-        <p>
-          Esta pantalla será implementada siguiendo
-          los mockups de SyncPass.
-        </p>
-
-        <Link href="/dashboard">
-          ← Volver al panel principal
-        </Link>
-      </main>
-    </div>
-  );
-}
-
-function DetalleProyecto({ id }: { id: string }) {
-  return (
-    <PaginaPendiente
-      titulo={`Detalle del proyecto: ${id}`}
-    />
-  );
-}
 
 function App() {
   const auth = useAuth();
 
   // Mientras Cognito comprueba la sesión
   if (auth.isLoading || auth.activeNavigator) {
-    return <div>Verificando autenticación...</div>;
+    return (
+      <main className="auth-estado">
+        <section className="auth-tarjeta" aria-live="polite">
+          <div className="auth-marca">
+            <span aria-hidden="true">▣</span>
+            SyncPass
+          </div>
+
+          <h1>Verificando autenticación</h1>
+          <p>
+            Estamos validando tu sesión con Amazon Cognito. Esto puede
+            tardar unos segundos.
+          </p>
+
+          <span className="auth-spinner" aria-hidden="true" />
+        </section>
+      </main>
+    );
   }
 
   // Si Cognito devuelve un error
   if (auth.error) {
     return (
-      <main>
-        <h1>Error de autenticación</h1>
-        <p>{auth.error.message}</p>
+      <main className="auth-estado">
+        <section className="auth-tarjeta" role="alert">
+          <div className="auth-marca">
+            <span aria-hidden="true">▣</span>
+            SyncPass
+          </div>
 
-        <button
-          type="button"
-          onClick={() => void auth.signinRedirect()}
-        >
-          Intentar iniciar sesión nuevamente
-        </button>
+          <h1>No pudimos validar tu sesión</h1>
+          <p>
+            Cognito no completó la autenticación. Puedes intentarlo de
+            nuevo sin perder los datos de demostración.
+          </p>
+          <p className="auth-detalle">{auth.error.message}</p>
+
+          <button
+            type="button"
+            className="auth-boton"
+            onClick={() => void auth.signinRedirect()}
+          >
+            Intentar iniciar sesión nuevamente
+          </button>
+        </section>
       </main>
     );
   }
@@ -97,6 +94,41 @@ function App() {
       />
 
       <Route
+        path="/proyectos/:id"
+        component={DetalleProyecto}
+      />
+
+      <Route
+        path="/participantes"
+        component={Participantes}
+      />
+
+      <Route
+        path="/reportes"
+        component={Reportes}
+      />
+
+      <Route
+        path="/perfil"
+        component={Perfil}
+      />
+
+      <Route
+        path="/quorum"
+        component={Quorum}
+      />
+
+      <Route
+        path="/encuestas"
+        component={Encuestas}
+      />
+
+      <Route
+        path="/historial"
+        component={Historial}
+      />
+
+      <Route
         path="/offline"
         component={ModoOffline}
       />
@@ -111,25 +143,10 @@ function App() {
         component={ConfirmacionAsistencia}
       />
 
-      <Route path="/proyectos/:id">
-        {(params) => (
-          <DetalleProyecto id={params.id} />
-        )}
-      </Route>
-
       <Route
         path="/eventos/:id"
         component={DetalleEvento}
       />
-
-      {paginasPendientes.map((pagina) => (
-        <Route
-          key={pagina.ruta}
-          path={pagina.ruta}
-        >
-          <PaginaPendiente titulo={pagina.titulo} />
-        </Route>
-      ))}
 
       <Route>
         <main className="pending-content">

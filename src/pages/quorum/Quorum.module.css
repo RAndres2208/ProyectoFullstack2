@@ -1,0 +1,136 @@
+.selector {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.8fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.eventoMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.eventoMeta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.eventoMeta strong {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.paneles {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.detalleQuorum {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin: 16px 0 12px;
+}
+
+.detalleQuorum > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+}
+
+.detalleQuorum strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.detalleQuorum span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.controlUmbral {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.controlUmbral label {
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.controlUmbral label strong {
+  color: var(--color-brand-primary);
+}
+
+.controlUmbral input[type="range"] {
+  width: 100%;
+  accent-color: var(--color-brand-primary);
+}
+
+.marcasRango {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+}
+
+.panelTabla {
+  margin-top: 14px;
+}
+
+.filtros {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(150px, 1fr);
+  gap: 10px;
+}
+
+.filtroBusqueda {
+  min-width: 0;
+}
+
+.correo {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 960px) {
+  .selector,
+  .paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .eventoMeta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filtros {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .detalleQuorum {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
