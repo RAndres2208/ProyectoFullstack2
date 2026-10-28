@@ -22,6 +22,7 @@ try {
     outfile: '.tmp/tests/tests.bundle.js',
     sourcemap: true,
     loader: { '.ts': 'ts', '.tsx': 'tsx', '.css': 'css' },
+    jsx: 'automatic',
     define: {
       'process.env.NODE_ENV': '"test"',
       'import.meta.env.VITE_API_URL': '"https://syncpass.test.invalid"',
