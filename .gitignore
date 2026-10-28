@@ -35,3 +35,7 @@ consume-api/
 *.njsproj
 *.sln
 *.sw?
+
+# Tests temporales
+.tmp/
+coverage/
