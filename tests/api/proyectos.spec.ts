@@ -1,11 +1,17 @@
 import { ErrorProyectos, obtenerProyectosApi } from '../../src/services/proyectosApi';
 
 describe('API01 - proyectos respuesta 200', () => {
+  let originalFetch: any;
+
+  beforeEach(() => {
+    originalFetch = (globalThis as any).fetch;
+  });
+
   afterEach(() => {
-    if ((globalThis.fetch as any) && typeof (globalThis.fetch as any).calls !== 'undefined') {
-      try {
-        (globalThis as any).fetch = undefined;
-      } catch (e) {}
+    if (originalFetch) {
+      (globalThis as any).fetch = originalFetch;
+    } else {
+      delete (globalThis as any).fetch;
     }
   });
 
@@ -25,8 +31,18 @@ describe('API01 - proyectos respuesta 200', () => {
 });
 
 describe('API02 - proyectos error 401', () => {
+  let originalFetch: any;
+
+  beforeEach(() => {
+    originalFetch = (globalThis as any).fetch;
+  });
+
   afterEach(() => {
-    try { (globalThis as any).fetch = undefined; } catch (e) {}
+    if (originalFetch) {
+      (globalThis as any).fetch = originalFetch;
+    } else {
+      delete (globalThis as any).fetch;
+    }
   });
 
   it('lanza ErrorProyectos tipo sesion', async () => {
@@ -43,8 +59,18 @@ describe('API02 - proyectos error 401', () => {
 });
 
 describe('API03 - proyectos error 403', () => {
+  let originalFetch: any;
+
+  beforeEach(() => {
+    originalFetch = (globalThis as any).fetch;
+  });
+
   afterEach(() => {
-    try { (globalThis as any).fetch = undefined; } catch (e) {}
+    if (originalFetch) {
+      (globalThis as any).fetch = originalFetch;
+    } else {
+      delete (globalThis as any).fetch;
+    }
   });
 
   it('lanza ErrorProyectos tipo permisos', async () => {
@@ -61,8 +87,18 @@ describe('API03 - proyectos error 403', () => {
 });
 
 describe('API04 - proyectos error 500', () => {
+  let originalFetch: any;
+
+  beforeEach(() => {
+    originalFetch = (globalThis as any).fetch;
+  });
+
   afterEach(() => {
-    try { (globalThis as any).fetch = undefined; } catch (e) {}
+    if (originalFetch) {
+      (globalThis as any).fetch = originalFetch;
+    } else {
+      delete (globalThis as any).fetch;
+    }
   });
 
   it('lanza ErrorProyectos tipo servidor', async () => {
