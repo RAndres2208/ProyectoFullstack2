@@ -4,6 +4,13 @@ import { createRoot } from 'react-dom/client'
 import { AuthProvider, type AuthProviderProps } from 'react-oidc-context'
 import './index.css'
 import App from './App.tsx'
+import { DemoRoleProvider } from './auth/demoRole'
+import { VistaPreviaProvider } from './auth/vistaPrevia'
+
+const isDev = import.meta.env.DEV;
+const redirectUri = 
+  import.meta.env.VITE_OIDC_REDIRECT_URI ?? 
+  (isDev ? 'http://localhost:5173/' : 'https://proyectofullstack-iota.vercel.app/');
 
 const cognitoAuthConfig: AuthProviderProps = {
   authority:
@@ -14,9 +21,7 @@ const cognitoAuthConfig: AuthProviderProps = {
     import.meta.env.VITE_OIDC_CLIENT_ID ??
     '13ucrn86m1rdgcvgmvf4pbo01f',
 
-  redirect_uri:
-    import.meta.env.VITE_OIDC_REDIRECT_URI ??
-    'https://proyectofullstack-iota.vercel.app/',
+  redirect_uri: redirectUri,
 
   response_type: 'code',
   scope: 'email openid phone',
@@ -33,7 +38,11 @@ const cognitoAuthConfig: AuthProviderProps = {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider {...cognitoAuthConfig}>
-      <App />
+      <DemoRoleProvider>
+        <VistaPreviaProvider>
+          <App />
+        </VistaPreviaProvider>
+      </DemoRoleProvider>
     </AuthProvider>
   </StrictMode>,
 )

@@ -39,10 +39,14 @@ function ShieldIcon({ size = 22 }: { size?: number }) {
   );
 }
 
+import { useDemoRole } from "../../auth/demoRole";
+
 export function Login() {
   const auth = useAuth();
   const [error, setError] = useState("");
   const [procesando, setProcesando] = useState(false);
+  const [mostrarSelector, setMostrarSelector] = useState(false);
+  const { setRolDemo } = useDemoRole();
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>
@@ -61,6 +65,16 @@ export function Login() {
       setProcesando(false);
     }
   }
+
+  const entrarComoDocente = () => {
+    setRolDemo("docente");
+    window.location.href = "/docente/dashboard";
+  };
+
+  const entrarComoEstudiante = () => {
+    setRolDemo("estudiante");
+    window.location.href = "/estudiante/dashboard";
+  };
 
   return (
     <div className="syncpass-page">
@@ -152,10 +166,7 @@ export function Login() {
             </p>
           </section>
 
-          <form
-            className="login-form"
-            onSubmit={handleSubmit}
-          >
+          <div className="login-form">
             <div className="form-field">
               <p>
                 Inicia sesión de forma segura
@@ -175,22 +186,56 @@ export function Login() {
                 Puedes acceder al panel principal.
               </p>
             ) : (
-              <button
-                type="submit"
-                className="login-button"
-                disabled={
-                  procesando ||
-                  auth.isLoading ||
-                  Boolean(auth.activeNavigator)
-                }
-              >
-                <span aria-hidden="true">→</span>
-                {procesando
-                  ? "Redirigiendo..."
-                  : "Ingresar con Cognito"}
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="login-button"
+                  onClick={() => setMostrarSelector(!mostrarSelector)}
+                  style={{ marginBottom: "0.5rem", background: "#fff", color: "#782f40", border: "2px solid #782f40" }}
+                >
+                  {mostrarSelector ? "Ocultar selector" : "Seleccionar rol antes de ingresar"}
+                </button>
+
+                {mostrarSelector && (
+                  <div style={{ display: "grid", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                    <button
+                      type="button"
+                      className="login-button"
+                      onClick={entrarComoDocente}
+                      style={{ background: "#782f40" }}
+                    >
+                      <span aria-hidden="true">🎓</span> Ingresar como Docente (Demo)
+                    </button>
+                    <button
+                      type="button"
+                      className="login-button"
+                      onClick={entrarComoEstudiante}
+                      style={{ background: "#8b3a4d" }}
+                    >
+                      <span aria-hidden="true">👨‍🎓</span> Ingresar como Estudiante (Demo)
+                    </button>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                  <button
+                    type="submit"
+                    className="login-button"
+                    disabled={
+                      procesando ||
+                      auth.isLoading ||
+                      Boolean(auth.activeNavigator)
+                    }
+                  >
+                    <span aria-hidden="true">→</span>
+                    {procesando
+                      ? "Redirigiendo..."
+                      : "Ingresar con Cognito"}
+                  </button>
+                </form>
+              </>
             )}
-          </form>
+          </div>
 
           <div className="role-information">
             <ShieldIcon size={21} />
