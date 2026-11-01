@@ -97,7 +97,7 @@ export function DetalleEvento() {
             <div className={styles.institucion}>
               <span className={styles.rol}>
                 <Icono tipo="check" size={16} />
-                Docente · Coordinador
+                SyncPass · Sesión verificada
               </span>
               <span className={styles.demo}>
                 DUOC UC · DEMO

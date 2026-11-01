@@ -9,7 +9,7 @@ export function PerfilEstudiante() {
   const email = auth.user?.profile?.email || "estudiante@duoc.cl";
 
   return (
-    <PageLayout titulo="Mi Perfil" descripcion="Información personal" volverA="/estudiante/dashboard" rol="Estudiante" demo="DUOC UC · DEMO">
+    <PageLayout titulo="Mi Perfil" descripcion="Información personal" volverA="/estudiante/dashboard" rol="◈ Estudiante" demo="DUOC UC · DEMO">
       <section className={styles.section}>
         <header className={styles.sectionHeader}>
           <div>
@@ -17,23 +17,27 @@ export function PerfilEstudiante() {
             <p>Información de tu cuenta</p>
           </div>
         </header>
-        <div style={{ padding: "1.5rem", display: "grid", gap: "1rem" }}>
-          <div>
-            <strong>Nombre:</strong>
-            <p style={{ margin: "0.25rem 0", color: "#6b4f4f" }}>{nombre}</p>
-          </div>
-          <div>
-            <strong>Correo:</strong>
-            <p style={{ margin: "0.25rem 0", color: "#6b4f4f" }}>{email}</p>
-          </div>
-          <div>
-            <strong>Rol:</strong>
-            <p style={{ margin: "0.25rem 0", color: "#6b4f4f" }}>Estudiante</p>
-          </div>
-          <div>
-            <strong>Institución:</strong>
-            <p style={{ margin: "0.25rem 0", color: "#6b4f4f" }}>DUOC UC</p>
-          </div>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <tbody>
+              <tr>
+                <th style={{ width: "200px" }}>Nombre</th>
+                <td>{nombre}</td>
+              </tr>
+              <tr>
+                <th>Correo</th>
+                <td>{email}</td>
+              </tr>
+              <tr>
+                <th>Rol</th>
+                <td>Estudiante</td>
+              </tr>
+              <tr>
+                <th>Institución</th>
+                <td>DUOC UC</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </PageLayout>

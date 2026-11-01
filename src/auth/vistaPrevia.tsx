@@ -1,22 +1,38 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
+import type { RolSyncPass } from "./roles";
 
-export type RolVistaPrevia = "docente" | "estudiante" | null;
+/**
+ * Vista previa aislada para revisar las pantallas de cada perfil. No cambia
+ * los grupos de Cognito, no emite tokens y no habilita operaciones reales.
+ */
+export type RolVistaPrevia = RolSyncPass | null;
 
 type VistaPreviaContextType = {
   activo: boolean;
   rol: RolVistaPrevia;
-  activar: (rol: RolVistaPrevia) => void;
+  activar: (rol: RolSyncPass) => void;
   salir: () => void;
 };
 
-const VistaPreviaContext = createContext<VistaPreviaContextType | undefined>(undefined);
+const VistaPreviaContext = createContext<
+  VistaPreviaContextType | undefined
+>(undefined);
 
-export function VistaPreviaProvider({ children }: { children: ReactNode }) {
+export function VistaPreviaProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [activo, setActivo] = useState(false);
   const [rol, setRol] = useState<RolVistaPrevia>(null);
 
-  const activar = (r: RolVistaPrevia) => {
-    setRol(r);
+  const activar = (nuevoRol: RolSyncPass) => {
+    setRol(nuevoRol);
     setActivo(true);
   };
 
@@ -34,6 +50,12 @@ export function VistaPreviaProvider({ children }: { children: ReactNode }) {
 
 export function useVistaPrevia() {
   const ctx = useContext(VistaPreviaContext);
-  if (!ctx) throw new Error("useVistaPrevia debe usarse dentro de VistaPreviaProvider");
+
+  if (!ctx) {
+    throw new Error(
+      "useVistaPrevia debe usarse dentro de VistaPreviaProvider"
+    );
+  }
+
   return ctx;
 }

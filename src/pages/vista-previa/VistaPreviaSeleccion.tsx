@@ -1,17 +1,28 @@
+import { useLocation } from "wouter";
+import {
+  ORDEN_ROLES,
+  ROLES,
+  type RolSyncPass,
+} from "../../auth/roles";
 import { useVistaPrevia } from "../../auth/vistaPrevia";
 import styles from "../seleccion/SeleccionRol.module.css";
 
+/**
+ * Acceso a la vista previa de los cuatro perfiles. El recorrido queda
+ * aislado de la sesión real y no modifica los grupos de Cognito.
+ */
 export function VistaPreviaSeleccion() {
-  const { activar } = useVistaPrevia();
+  const { activar, salir } = useVistaPrevia();
+  const [, setLocation] = useLocation();
 
-  const entrarDocente = () => {
-    activar("docente");
-    window.location.href = "/docente/dashboard";
+  const entrarComo = (rol: RolSyncPass) => {
+    activar(rol);
+    setLocation(ROLES[rol].rutaInicio);
   };
 
-  const entrarEstudiante = () => {
-    activar("estudiante");
-    window.location.href = "/estudiante/dashboard";
+  const salirDeVistaPrevia = () => {
+    salir();
+    setLocation("/");
   };
 
   return (
@@ -24,34 +35,44 @@ export function VistaPreviaSeleccion() {
           </div>
           <h1>Vista previa de roles</h1>
           <p>
-            Visualización aislada para demostración académica. 
-            No modifica permisos ni tokens de Cognito.
+            Recorre las pantallas de cada perfil con datos de demostración.
+            Esta vista no modifica permisos, tokens ni la sesión de Cognito.
           </p>
-          <span className={styles.demoBadge}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</span>
+          <span className={styles.demoBadge}>
+            VISTA PREVIA · DATOS DE DEMOSTRACIÓN
+          </span>
         </header>
 
         <div className={styles.grid}>
-          <article className={styles.card}>
-            <div className={styles.cardIcono} aria-hidden="true">🎓</div>
-            <h2>Vista Docente</h2>
-            <p>Administrar cursos, estudiantes y asistencias. CRUD simulados en memoria.</p>
-            <button type="button" className={styles.boton} onClick={entrarDocente}>
-              Ver vista Docente
-            </button>
-          </article>
-
-          <article className={styles.card}>
-            <div className={styles.cardIcono} aria-hidden="true">👨‍🎓</div>
-            <h2>Vista Estudiante</h2>
-            <p>Consultar mis cursos, asistencia y perfil. Datos de demostración.</p>
-            <button type="button" className={styles.boton} onClick={entrarEstudiante}>
-              Ver vista Estudiante
-            </button>
-          </article>
+          {ORDEN_ROLES.map((rol) => (
+            <article className={styles.card} key={rol}>
+              <div className={styles.cardIcono} aria-hidden="true">
+                {ROLES[rol].icono}
+              </div>
+              <h2>{ROLES[rol].etiqueta}</h2>
+              <p>{ROLES[rol].descripcion}</p>
+              <button
+                type="button"
+                className={styles.boton}
+                onClick={() => entrarComo(rol)}
+              >
+                Ver vista {ROLES[rol].etiqueta}
+              </button>
+            </article>
+          ))}
         </div>
 
+        <p className={styles.nota}>
+          Al salir de la vista previa volverás a tu sesión real. Los permisos
+          siguen dependiendo de los grupos asignados en Cognito.
+        </p>
+
         <footer className={styles.pie}>
-          <button type="button" className={styles.botonSecundario} onClick={() => window.location.href = "/"}>
+          <button
+            type="button"
+            className={styles.botonSecundario}
+            onClick={salirDeVistaPrevia}
+          >
             Salir de vista previa
           </button>
         </footer>

@@ -361,7 +361,7 @@ export function Proyectos() {
           <main className={styles.contenido}>
             <div className={styles.institucion}>
               <span className={styles.rol}>
-                ◈ Docente · Coordinador
+                ◈ SyncPass
               </span>
 
               <span className={styles.demo}>

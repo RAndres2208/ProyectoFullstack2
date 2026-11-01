@@ -1,42 +1,71 @@
-
-import { EscanerQR } from "./pages/escaner/EscanerQR";
-import { ConfirmacionAsistencia } from "./pages/escaner/ConfirmacionAsistencia";
-import { Link, Route, Switch, Redirect } from "wouter";
-import { Login } from "./pages/login/Login";
-import { SeleccionRol } from "./pages/seleccion/SeleccionRol";
-import { VistaPreviaSeleccion } from "./pages/vista-previa/VistaPreviaSeleccion";
-import { Dashboard } from "./pages/dashboard/Dashboard";
-import { DashboardDocente } from "./pages/docente/DashboardDocente";
-import { CursosDocente } from "./pages/docente/CursosDocente";
-import { EstudiantesDocente } from "./pages/docente/EstudiantesDocente";
+import { useAuth } from "react-oidc-context";
+import { Link, Redirect, Route, Switch, useLocation } from "wouter";
+import { useDemoRole } from "./auth/demoRole";
+import { usePerfilActivo } from "./auth/perfilActivo";
+import {
+  ROLES,
+  useRoles,
+  type RolSyncPass,
+} from "./auth/roles";
+import { useVistaPrevia } from "./auth/vistaPrevia";
+import { AccesoDenegado } from "./pages/acceso/AccesoDenegado";
+import {
+  ConfiguracionAdministrador,
+  CursosAdministrador,
+  DashboardAdministrador,
+  RolesAdministrador,
+  UsuariosAdministrador,
+} from "./pages/administrador/Administrador";
+import { AsistenciaCoordinador } from "./pages/coordinador/AsistenciaCoordinador";
+import { CursosCoordinador } from "./pages/coordinador/CursosCoordinador";
+import { DashboardCoordinador } from "./pages/coordinador/DashboardCoordinador";
+import { DocentesCoordinador } from "./pages/coordinador/DocentesCoordinador";
+import { VistasRol } from "./pages/demo/VistasRol";
 import { AsistenciaDocente } from "./pages/docente/AsistenciaDocente";
+import { CursosDocente } from "./pages/docente/CursosDocente";
+import { DashboardDocente } from "./pages/docente/DashboardDocente";
+import { EstudiantesDocente } from "./pages/docente/EstudiantesDocente";
+import { Encuestas } from "./pages/encuestas/Encuestas";
+import { ConfirmacionAsistencia } from "./pages/escaner/ConfirmacionAsistencia";
+import { EscanerQR } from "./pages/escaner/EscanerQR";
 import { DashboardEstudiante } from "./pages/estudiante/DashboardEstudiante";
-import { MisCursos } from "./pages/estudiante/MisCursos";
 import { MiAsistencia } from "./pages/estudiante/MiAsistencia";
+import { MisCursos } from "./pages/estudiante/MisCursos";
 import { PerfilEstudiante } from "./pages/estudiante/PerfilEstudiante";
-import { Proyectos } from "./pages/proyectos/Proyectos";
-import { DetalleProyecto } from "./pages/proyectos/DetalleProyecto";
 import { DetalleEvento } from "./pages/eventos/DetalleEvento";
+import { Historial } from "./pages/historial/Historial";
+import { Login } from "./pages/login/Login";
 import { ModoOffline } from "./pages/offline/ModoOffline";
 import { Participantes } from "./pages/participantes/Participantes";
-import { Reportes } from "./pages/reportes/Reportes";
 import { Perfil } from "./pages/perfil/Perfil";
+import { Proyectos } from "./pages/proyectos/Proyectos";
+import { DetalleProyecto } from "./pages/proyectos/DetalleProyecto";
 import { Quorum } from "./pages/quorum/Quorum";
-import { Encuestas } from "./pages/encuestas/Encuestas";
-import { Historial } from "./pages/historial/Historial";
-import { useAuth } from "react-oidc-context";
-import { useRol } from "./auth/roles";
-import { useDemoRole } from "./auth/demoRole";
-import { useVistaPrevia } from "./auth/vistaPrevia";
+import { Reportes } from "./pages/reportes/Reportes";
+import { SeleccionRol } from "./pages/seleccion/SeleccionRol";
+import { VistaPreviaSeleccion } from "./pages/vista-previa/VistaPreviaSeleccion";
 
 function App() {
   const auth = useAuth();
-  const { rol, cargando: rolCargando, esDocente, esEstudiante } = useRol();
-  const { rolDemo, esModoDemo } = useDemoRole();
-  const { activo: vistaPreviaActiva, rol: rolVistaPrevia } = useVistaPrevia();
+  const [, setLocation] = useLocation();
+  const { roles, cargando: rolesCargando } = useRoles();
+  const { rolActivo } = usePerfilActivo();
+  const { rolDemo, esModoDemo, limpiarRolDemo } = useDemoRole();
+  const {
+    activo: vistaPreviaActiva,
+    rol: rolVistaPrevia,
+    salir: salirVistaPrevia,
+  } = useVistaPrevia();
+
+  const rutaInicio = rolActivo
+    ? ROLES[rolActivo].rutaInicio
+    : "/seleccion-rol";
+
+  const puedeAcceder = (...requeridos: RolSyncPass[]) =>
+    requeridos.some((rol) => roles.includes(rol));
 
   // Mientras Cognito comprueba la sesión
-  if (auth.isLoading || auth.activeNavigator || rolCargando) {
+  if (auth.isLoading || auth.activeNavigator || rolesCargando) {
     return (
       <main className="auth-estado">
         <section className="auth-tarjeta" aria-live="polite">
@@ -86,155 +115,279 @@ function App() {
     );
   }
 
-  // Los usuarios sin sesión no pueden acceder
-  // a las páginas privadas de SyncPass (excepto modo demo pre-autenticación)
+  // Las personas sin sesión solo pueden entrar al login o a la demo aislada.
   if (!auth.isAuthenticated) {
-    // Permitir modo demo sin autenticación si hay rolDemo guardado
     if (esModoDemo && rolDemo) {
-      const rutaDashboard = rolDemo === "docente" ? "/docente/dashboard" : "/estudiante/dashboard";
       return (
-        <Switch>
-          <Route path="/">
-            <Redirect to={rutaDashboard} />
-          </Route>
-          <Route path="/docente/dashboard"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><DashboardDocente/></></Route>
-          <Route path="/docente/cursos"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><CursosDocente/></></Route>
-          <Route path="/docente/estudiantes"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><EstudiantesDocente/></></Route>
-          <Route path="/docente/asistencia"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><AsistenciaDocente/></></Route>
-          <Route path="/estudiante/dashboard"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><DashboardEstudiante/></></Route>
-          <Route path="/estudiante/mis-cursos"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><MisCursos/></></Route>
-          <Route path="/estudiante/mi-asistencia"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><MiAsistencia/></></Route>
-          <Route path="/estudiante/perfil"><><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><PerfilEstudiante/></></Route>
-          <Route path="/login"><Login /></Route>
-          <Route><Login /></Route>
-        </Switch>
+        <VistasRol
+          rol={rolDemo}
+          tipo="demo"
+          onSalir={() => {
+            limpiarRolDemo();
+            setLocation("/");
+          }}
+          onCambiar={() => {
+            setLocation("/seleccion-rol");
+          }}
+        />
       );
     }
+
     return <Login />;
   }
 
-  // Solo los usuarios autenticados llegan aquí
-  const tieneRolReal = esDocente || esEstudiante;
-  
+  // La vista previa se mantiene separada de la sesión real.
   if (vistaPreviaActiva && rolVistaPrevia) {
-    const rutaDashboard = rolVistaPrevia === "docente" ? "/docente/dashboard" : "/estudiante/dashboard";
     return (
-      <Switch>
-        <Route path="/">
-          <Redirect to={rutaDashboard} />
-        </Route>
-        <Route path="/vista-previa" component={VistaPreviaSeleccion} />
-        <Route path="/docente/dashboard">{rolVistaPrevia === "docente" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><DashboardDocente/></> : <Redirect to="/" />}</Route>
-        <Route path="/docente/cursos">{rolVistaPrevia === "docente" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><CursosDocente/></> : <Redirect to="/" />}</Route>
-        <Route path="/docente/estudiantes">{rolVistaPrevia === "docente" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><EstudiantesDocente/></> : <Redirect to="/" />}</Route>
-        <Route path="/docente/asistencia">{rolVistaPrevia === "docente" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><AsistenciaDocente/></> : <Redirect to="/" />}</Route>
-        <Route path="/estudiante/dashboard">{rolVistaPrevia === "estudiante" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><DashboardEstudiante/></> : <Redirect to="/" />}</Route>
-        <Route path="/estudiante/mis-cursos">{rolVistaPrevia === "estudiante" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><MisCursos/></> : <Redirect to="/" />}</Route>
-        <Route path="/estudiante/mi-asistencia">{rolVistaPrevia === "estudiante" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><MiAsistencia/></> : <Redirect to="/" />}</Route>
-        <Route path="/estudiante/perfil">{rolVistaPrevia === "estudiante" ? <><div style={{position:"fixed",top:0,left:0,right:0,background:"#782f40",color:"#fff",textAlign:"center",padding:"0.25rem",fontSize:"0.75rem",zIndex:1000}}>VISTA PREVIA — DATOS DE DEMOSTRACIÓN</div><PerfilEstudiante/></> : <Redirect to="/" />}</Route>
-      </Switch>
+      <VistasRol
+        rol={rolVistaPrevia}
+        tipo="vista-previa"
+        onSalir={() => {
+          salirVistaPrevia();
+          setLocation("/");
+        }}
+        onCambiar={() => {
+          setLocation("/vista-previa");
+        }}
+      />
     );
   }
-  
-  if (!tieneRolReal && rol === "desconocido" && !esModoDemo) {
+
+  // Una sesión sin grupos de SyncPass no accede a rutas privadas.
+  if (roles.length === 0) {
+    if (esModoDemo && rolDemo) {
+      return (
+        <VistasRol
+          rol={rolDemo}
+          tipo="demo"
+          onSalir={() => {
+            limpiarRolDemo();
+            setLocation("/");
+          }}
+          onCambiar={() => {
+            setLocation("/seleccion-rol");
+          }}
+        />
+      );
+    }
+
     return <SeleccionRol />;
   }
 
-  // Si hay rol real en Cognito, este SIEMPRE tiene prioridad
-  const rolEfectivo = tieneRolReal ? rol : rolDemo;
-  const rutaDashboard = rolEfectivo === "docente" ? "/docente/dashboard" : rolEfectivo === "estudiante" ? "/estudiante/dashboard" : "/dashboard";
-  
   return (
     <Switch>
       <Route path="/">
-        <Redirect to={rutaDashboard} />
+        <Redirect to={rutaInicio} />
       </Route>
 
       <Route path="/vista-previa" component={VistaPreviaSeleccion} />
-      <Route path="/seleccion-rol" component={SeleccionRol} />
-
-      <Route path="/docente/dashboard" component={rolEfectivo === "docente" ? DashboardDocente : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
-      <Route path="/docente/cursos" component={rolEfectivo === "docente" ? CursosDocente : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
-      <Route path="/docente/estudiantes" component={rolEfectivo === "docente" ? EstudiantesDocente : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
-      <Route path="/docente/asistencia" component={rolEfectivo === "docente" ? AsistenciaDocente : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
-      
-      <Route path="/estudiante/dashboard" component={rolEfectivo === "estudiante" ? DashboardEstudiante : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
-      <Route path="/estudiante/mis-cursos" component={rolEfectivo === "estudiante" ? MisCursos : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
-      <Route path="/estudiante/mi-asistencia" component={rolEfectivo === "estudiante" ? MiAsistencia : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
-      <Route path="/estudiante/perfil" component={rolEfectivo === "estudiante" ? PerfilEstudiante : () => <Redirect to={tieneRolReal ? rutaDashboard : "/seleccion-rol"} />} />
+      <Route path="/seleccion-rol">
+        <Redirect to={rutaInicio} />
+      </Route>
 
       <Route
-        path="/dashboard"
-        component={Dashboard}
+        path="/docente/dashboard"
+        component={
+          puedeAcceder("profesor") ? DashboardDocente : AccesoDenegado
+        }
+      />
+      <Route
+        path="/docente/cursos"
+        component={puedeAcceder("profesor") ? CursosDocente : AccesoDenegado}
+      />
+      <Route
+        path="/docente/estudiantes"
+        component={
+          puedeAcceder("profesor") ? EstudiantesDocente : AccesoDenegado
+        }
+      />
+      <Route
+        path="/docente/asistencia"
+        component={
+          puedeAcceder("profesor") ? AsistenciaDocente : AccesoDenegado
+        }
       />
 
+      <Route
+        path="/estudiante/dashboard"
+        component={
+          puedeAcceder("estudiante") ? DashboardEstudiante : AccesoDenegado
+        }
+      />
+      <Route
+        path="/estudiante/mis-cursos"
+        component={puedeAcceder("estudiante") ? MisCursos : AccesoDenegado}
+      />
+      <Route
+        path="/estudiante/mi-asistencia"
+        component={
+          puedeAcceder("estudiante") ? MiAsistencia : AccesoDenegado
+        }
+      />
+      <Route
+        path="/estudiante/perfil"
+        component={
+          puedeAcceder("estudiante") ? PerfilEstudiante : AccesoDenegado
+        }
+      />
+
+      <Route
+        path="/coordinador/dashboard"
+        component={
+          puedeAcceder("coordinador") ? DashboardCoordinador : AccesoDenegado
+        }
+      />
+      <Route
+        path="/coordinador/cursos"
+        component={
+          puedeAcceder("coordinador") ? CursosCoordinador : AccesoDenegado
+        }
+      />
+      <Route
+        path="/coordinador/docentes"
+        component={
+          puedeAcceder("coordinador") ? DocentesCoordinador : AccesoDenegado
+        }
+      />
+      <Route
+        path="/coordinador/asistencia"
+        component={
+          puedeAcceder("coordinador")
+            ? AsistenciaCoordinador
+            : AccesoDenegado
+        }
+      />
+
+      <Route
+        path="/administrador/dashboard"
+        component={
+          puedeAcceder("administrador")
+            ? DashboardAdministrador
+            : AccesoDenegado
+        }
+      />
+      <Route
+        path="/administrador/usuarios"
+        component={
+          puedeAcceder("administrador")
+            ? UsuariosAdministrador
+            : AccesoDenegado
+        }
+      />
+      <Route
+        path="/administrador/roles"
+        component={
+          puedeAcceder("administrador")
+            ? RolesAdministrador
+            : AccesoDenegado
+        }
+      />
+      <Route
+        path="/administrador/cursos"
+        component={
+          puedeAcceder("administrador")
+            ? CursosAdministrador
+            : AccesoDenegado
+        }
+      />
+      <Route
+        path="/administrador/configuracion"
+        component={
+          puedeAcceder("administrador")
+            ? ConfiguracionAdministrador
+            : AccesoDenegado
+        }
+      />
+
+      <Route path="/dashboard">
+        <Redirect to={rutaInicio} />
+      </Route>
       <Route
         path="/proyectos"
-        component={Proyectos}
+        component={
+          puedeAcceder("estudiante", "profesor", "coordinador")
+            ? Proyectos
+            : AccesoDenegado
+        }
       />
-
       <Route
         path="/proyectos/:id"
-        component={DetalleProyecto}
+        component={
+          puedeAcceder("estudiante", "profesor", "coordinador")
+            ? DetalleProyecto
+            : AccesoDenegado
+        }
       />
-
       <Route
         path="/participantes"
-        component={Participantes}
+        component={
+          puedeAcceder("estudiante", "profesor")
+            ? Participantes
+            : AccesoDenegado
+        }
       />
-
       <Route
         path="/reportes"
-        component={Reportes}
+        component={
+          puedeAcceder("profesor", "coordinador")
+            ? Reportes
+            : AccesoDenegado
+        }
       />
-
-      <Route
-        path="/perfil"
-        component={Perfil}
-      />
-
+      <Route path="/perfil" component={Perfil} />
       <Route
         path="/quorum"
-        component={Quorum}
+        component={
+          puedeAcceder("estudiante", "profesor") ? Quorum : AccesoDenegado
+        }
       />
-
       <Route
         path="/encuestas"
-        component={Encuestas}
+        component={
+          puedeAcceder("estudiante", "profesor") ? Encuestas : AccesoDenegado
+        }
       />
-
       <Route
         path="/historial"
-        component={Historial}
+        component={
+          puedeAcceder("estudiante", "profesor") ? Historial : AccesoDenegado
+        }
       />
-
       <Route
         path="/offline"
-        component={ModoOffline}
+        component={
+          puedeAcceder("estudiante", "profesor") ? ModoOffline : AccesoDenegado
+        }
       />
 
       <Route
         path="/escaner"
-        component={EscanerQR}
+        component={puedeAcceder("estudiante") ? EscanerQR : AccesoDenegado}
       />
 
       <Route
         path="/asistencia/confirmacion/:id"
-        component={ConfirmacionAsistencia}
+        component={
+          puedeAcceder("estudiante")
+            ? ConfirmacionAsistencia
+            : AccesoDenegado
+        }
       />
 
       <Route
         path="/eventos/:id"
-        component={DetalleEvento}
+        component={
+          puedeAcceder("estudiante", "profesor")
+            ? DetalleEvento
+            : AccesoDenegado
+        }
       />
 
       <Route>
         <main className="pending-content">
           <h1>Página no encontrada</h1>
 
-          <Link href="/dashboard">
-            Volver al inicio
-          </Link>
+          <Link href={rutaInicio}>Volver al inicio</Link>
         </main>
       </Route>
     </Switch>

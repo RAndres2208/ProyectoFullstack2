@@ -460,6 +460,77 @@ a:focus-visible {
   font-weight: 400;
 }
 
+.demo-toggle {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 9px 12px;
+  border: 1px solid var(--color-brand-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-brand-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.demo-toggle:hover {
+  background: var(--color-brand-accent-soft);
+}
+
+.demo-roles {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.demo-roles-title {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.demo-role-button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+.demo-role-button:hover {
+  border-color: var(--color-brand-accent-strong);
+  background: var(--color-brand-accent-soft);
+}
+
+.demo-role-button > span[aria-hidden="true"] {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.demo-role-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.demo-role-text strong {
+  color: var(--color-brand-primary);
+  font-size: 13px;
+}
+
+.demo-role-text small {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 /* =========================================
    INFORMACIÓN INSTITUCIONAL
 ========================================= */

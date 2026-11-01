@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PageLayout } from "../../components/page-layout/PageLayout";
 import { cursosDemo, type Curso } from "../../data/cursosData";
+import styles from "../dashboard/Dashboard.module.css";
 
 export function CursosDocente() {
   const [cursos, setCursos] = useState<Curso[]>(cursosDemo);
@@ -52,7 +53,7 @@ export function CursosDocente() {
       titulo="Mantenedor de Cursos"
       descripcion="Gestión académica - Modo demostración"
       volverA="/docente/dashboard"
-      rol="◈ Docente · Coordinador"
+      rol="◈ Docente"
       demo="DUOC UC · DEMO"
     >
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
@@ -68,37 +69,39 @@ export function CursosDocente() {
         </button>
       </div>
 
-      <div style={{ background: "#fff", borderRadius: "0.75rem", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead style={{ background: "#f8f9fa" }}>
-            <tr>
-              <th style={{ padding: "1rem", textAlign: "left", borderBottom: "2px solid #dee2e6" }}>Código</th>
-              <th style={{ padding: "1rem", textAlign: "left", borderBottom: "2px solid #dee2e6" }}>Nombre</th>
-              <th style={{ padding: "1rem", textAlign: "left", borderBottom: "2px solid #dee2e6" }}>Docente</th>
-              <th style={{ padding: "1rem", textAlign: "left", borderBottom: "2px solid #dee2e6" }}>Estado</th>
-              <th style={{ padding: "1rem", textAlign: "center", borderBottom: "2px solid #dee2e6" }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cursosFiltrados.map(curso => (
-              <tr key={curso.id} style={{ borderBottom: "1px solid #f1f1f1" }}>
-                <td style={{ padding: "1rem" }}>{curso.codigo}</td>
-                <td style={{ padding: "1rem" }}>{curso.nombre}</td>
-                <td style={{ padding: "1rem" }}>{curso.docente}</td>
-                <td style={{ padding: "1rem" }}>
-                  <span style={{ padding: "0.25rem 0.75rem", background: curso.estado === "Activo" ? "#e8f5e9" : "#f5f5f5", color: curso.estado === "Activo" ? "#2e7d32" : "#666", borderRadius: "0.25rem", fontSize: "0.875rem" }}>
-                    {curso.estado}
-                  </span>
-                </td>
-                <td style={{ padding: "1rem", textAlign: "center", display: "flex", gap: "0.5rem", justifyContent: "center" }}>
-                  <button onClick={() => abrirEditar(curso)} style={{ padding: "0.375rem 0.75rem", background: "#007bff", color: "#fff", border: "none", borderRadius: "0.25rem", cursor: "pointer" }}>Editar</button>
-                  <button onClick={() => eliminar(curso.id)} style={{ padding: "0.375rem 0.75rem", background: "#dc3545", color: "#fff", border: "none", borderRadius: "0.25rem", cursor: "pointer" }}>Eliminar</button>
-                </td>
+      <section className={styles.section}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Docente</th>
+                <th>Estado</th>
+                <th style={{ textAlign: "center" }}>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {cursosFiltrados.map(curso => (
+                <tr key={curso.id}>
+                  <td>{curso.codigo}</td>
+                  <td>{curso.nombre}</td>
+                  <td>{curso.docente}</td>
+                  <td>
+                    <span className={curso.estado === "Activo" ? styles.badgeSuccess : styles.badgeWarning}>
+                      {curso.estado}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: "center", display: "flex", gap: "0.5rem", justifyContent: "center", flexWrap: "wrap" }}>
+                    <button onClick={() => abrirEditar(curso)} style={{ padding: "0.375rem 0.75rem", background: "#782f40", color: "#fff", border: "none", borderRadius: "0.25rem", cursor: "pointer" }}>Editar</button>
+                    <button onClick={() => eliminar(curso.id)} style={{ padding: "0.375rem 0.75rem", background: "#8b2635", color: "#fff", border: "none", borderRadius: "0.25rem", cursor: "pointer" }}>Eliminar</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <p style={{ marginTop: "1rem", color: "#666", fontSize: "0.875rem" }}>Datos de demostración - Primer mantenedor web</p>
 

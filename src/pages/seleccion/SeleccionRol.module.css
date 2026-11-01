@@ -54,7 +54,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
   padding: 2rem;
 }
@@ -104,6 +104,15 @@
 
 .boton:hover {
   background: #6a2938;
+}
+
+.nota {
+  margin: 0;
+  padding: 0 2rem;
+  color: #746670;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .pie {

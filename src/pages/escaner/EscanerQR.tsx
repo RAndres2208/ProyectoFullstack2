@@ -52,7 +52,7 @@ export function EscanerQR() {
           <main className={styles.contenido}>
             <div className={styles.institucion}>
               <span className={styles.rol}>
-                ◈ Monitor · Voluntario
+                ◈ Estudiante
               </span>
               <span className={styles.demo}>
                 DUOC UC · DEMO

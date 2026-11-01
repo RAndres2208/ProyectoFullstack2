@@ -1,5 +1,6 @@
 import { PageLayout } from "../../components/page-layout/PageLayout";
 import { useState } from "react";
+import styles from "../dashboard/Dashboard.module.css";
 
 export function AsistenciaDocente() {
   const [asistencias] = useState([
@@ -9,31 +10,33 @@ export function AsistenciaDocente() {
   ]);
 
   return (
-    <PageLayout titulo="Gestionar Asistencia" descripcion="Registro y control de asistencia - Modo demostración" volverA="/docente/dashboard" rol="◈ Docente · Coordinador" demo="DUOC UC · DEMO">
-      <div style={{background:"#fff",borderRadius:"0.75rem",overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,0.05)",marginTop:"1rem"}}>
-        <table style={{width:"100%",borderCollapse:"collapse"}}>
-          <thead style={{background:"#f8f9fa"}}>
-            <tr>
-              <th style={{padding:"1rem",textAlign:"left",borderBottom:"2px solid #dee2e6"}}>Estudiante</th>
-              <th style={{padding:"1rem",textAlign:"left",borderBottom:"2px solid #dee2e6"}}>Curso</th>
-              <th style={{padding:"1rem",textAlign:"left",borderBottom:"2px solid #dee2e6"}}>Fecha</th>
-              <th style={{padding:"1rem",textAlign:"center",borderBottom:"2px solid #dee2e6"}}>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {asistencias.map(a => (
-              <tr key={a.id} style={{borderBottom:"1px solid #f1f1f1"}}>
-                <td style={{padding:"1rem"}}>{a.estudiante}</td>
-                <td style={{padding:"1rem"}}>{a.curso}</td>
-                <td style={{padding:"1rem"}}>{a.fecha}</td>
-                <td style={{padding:"1rem",textAlign:"center"}}>
-                  <span style={{padding:"0.25rem 0.75rem",background:a.estado==="Presente"?"#e8f5e9":"#ffebee",color:a.estado==="Presente"?"#2e7d32":"#c62828",borderRadius:"0.25rem",fontSize:"0.875rem"}}>{a.estado}</span>
-                </td>
+    <PageLayout titulo="Gestionar Asistencia" descripcion="Registro y control de asistencia - Modo demostración" volverA="/docente/dashboard" rol="◈ Docente" demo="DUOC UC · DEMO">
+      <section className={styles.section}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Fecha</th>
+                <th style={{ textAlign: "center" }}>Estado</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {asistencias.map(a => (
+                <tr key={a.id}>
+                  <td>{a.estudiante}</td>
+                  <td>{a.curso}</td>
+                  <td>{a.fecha}</td>
+                  <td style={{ textAlign: "center" }}>
+                    <span className={a.estado === "Presente" ? styles.badgeSuccess : styles.badgeWarning}>{a.estado}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </PageLayout>
   );
 }

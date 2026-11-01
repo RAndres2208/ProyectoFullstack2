@@ -11,7 +11,7 @@ export function EstudiantesDocente() {
   );
 
   return (
-    <PageLayout titulo="Mantenedor de Estudiantes" descripcion="Gestión académica - Modo demostración" volverA="/docente/dashboard" rol="◈ Docente · Coordinador" demo="DUOC UC · DEMO">
+    <PageLayout titulo="Mantenedor de Estudiantes" descripcion="Gestión académica - Modo demostración" volverA="/docente/dashboard" rol="◈ Docente" demo="DUOC UC · DEMO">
       <div style={{display:"flex",gap:"1rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
         <input type="search" placeholder="Buscar por nombre o email..." value={busqueda} onChange={(e)=>setBusqueda(e.target.value)} style={{flex:"1",minWidth:"200px",padding:"0.75rem",borderRadius:"0.5rem",border:"1px solid #ddd"}}/>
       </div>

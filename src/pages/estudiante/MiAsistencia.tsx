@@ -1,4 +1,5 @@
 import { PageLayout } from "../../components/page-layout/PageLayout";
+import { AvisoDemo } from "../../components/ui/Ui";
 import { useAuth } from "react-oidc-context";
 import { obtenerNombreUsuario } from "../../auth/roles";
 import styles from "../dashboard/Dashboard.module.css";
@@ -14,7 +15,7 @@ export function MiAsistencia() {
   ];
 
   return (
-    <PageLayout titulo="Mi Asistencia" descripcion="Registro de asistencia - Solo consulta" volverA="/estudiante/dashboard" rol="Estudiante" demo="DUOC UC · DEMO">
+    <PageLayout titulo="Mi Asistencia" descripcion="Registro de asistencia - Solo consulta" volverA="/estudiante/dashboard" rol="◈ Estudiante" demo="DUOC UC · DEMO">
       <div className={styles.welcome}>
         <div>
           <p className={styles.welcomeLabel}>Hola,</p>
@@ -22,6 +23,11 @@ export function MiAsistencia() {
           <p className={styles.welcomeSubtitle}>Consulta tu historial de asistencia</p>
         </div>
       </div>
+
+      <AvisoDemo>
+        Los registros de asistencia son ficticios y no provienen de la API.
+        Esta pantalla es solo de consulta.
+      </AvisoDemo>
 
       <section className={styles.section}>
         <header className={styles.sectionHeader}>

@@ -64,7 +64,7 @@ export function PageLayout({
           <main className={styles.contenido}>
             <div className={styles.institucion}>
               <span className={styles.rol}>
-                {rol ?? "◈ Docente · Coordinador"}
+                {rol ?? "◈ Docente"}
               </span>
               <span className={styles.demo}>
                 {demo ?? "DUOC UC · DEMO"}

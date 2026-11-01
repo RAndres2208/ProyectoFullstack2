@@ -1,0 +1,96 @@
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px;
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  border-bottom: 1px solid var(--color-brand-accent);
+}
+
+.icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-sm);
+  color: var(--color-brand-accent);
+  font-size: 13px;
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.texto strong {
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.texto span {
+  color: var(--color-text-inverse-muted);
+}
+
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.boton {
+  min-height: 31px;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.boton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.boton:focus-visible {
+  outline: 2px solid var(--color-focus-inverse);
+  outline-offset: 2px;
+}
+
+@media (max-width: 620px) {
+  .banner {
+    align-items: flex-start;
+    padding: 8px 12px;
+  }
+
+  .texto {
+    font-size: 11px;
+  }
+
+  .acciones {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .boton {
+    min-height: 27px;
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,50 @@
+.itemAsistencia {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(180px, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 17px 19px;
+  background: #fcfaf8;
+  border: 1px solid #e8dfe1;
+  border-radius: 12px;
+}
+
+.datosCurso {
+  min-width: 0;
+}
+
+.datosCurso strong {
+  display: block;
+  color: #35232d;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.datosCurso p {
+  margin: 6px 0 0;
+  color: #746670;
+  font-size: 13px;
+}
+
+.progreso {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .itemAsistencia {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+
+  .progreso {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .itemAsistencia {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: flex-start;
+    padding: 14px;
+  }
+}

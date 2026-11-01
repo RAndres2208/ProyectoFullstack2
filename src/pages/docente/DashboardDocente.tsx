@@ -3,6 +3,7 @@ import { useAuth } from "react-oidc-context";
 import { cursosDemo, estudiantesDemo } from "../../data/cursosData";
 import { obtenerNombreUsuario } from "../../auth/roles";
 import { PageLayout } from "../../components/page-layout/PageLayout";
+import { AvisoDemo } from "../../components/ui/Ui";
 import styles from "../dashboard/Dashboard.module.css";
 
 const accionesDocente = [
@@ -21,14 +22,19 @@ export function DashboardDocente() {
   const totalEstudiantes = estudiantesDemo.length;
 
   return (
-    <PageLayout titulo="Dashboard Docente" descripcion="Panel de coordinación - Gestión académica y asistencia" rol="◈ Docente · Coordinador" demo="DUOC UC · DEMO">
+    <PageLayout titulo="Dashboard Docente" descripcion="Panel docente - Gestión académica y asistencia" rol="◈ Docente" demo="DUOC UC · DEMO">
       <section className={styles.welcome}>
         <div>
           <p className={styles.welcomeLabel}>Bienvenido/a,</p>
           <h2 className={styles.welcomeName}>{nombre}</h2>
-          <p className={styles.welcomeSubtitle}>Panel de coordinación - Gestión académica y asistencia</p>
+          <p className={styles.welcomeSubtitle}>Panel docente - Gestión académica y asistencia</p>
         </div>
       </section>
+
+      <AvisoDemo>
+        Los cursos, estudiantes y asistencias de esta vista son ficticios.
+        Los mantenedores funcionan en memoria y no guardan cambios en la API.
+      </AvisoDemo>
 
       <section className={styles.stats}>
         <article className={styles.statCard}>

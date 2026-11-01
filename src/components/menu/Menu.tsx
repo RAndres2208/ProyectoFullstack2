@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "react-oidc-context";
 import { Link, useLocation } from "wouter";
 import { useDemoRole } from "../../auth/demoRole";
-import { useRol } from "../../auth/roles";
+import { usePerfilActivo } from "../../auth/perfilActivo";
+import {
+  ROLES,
+  obtenerNombreUsuario,
+  type RolSyncPass,
+} from "../../auth/roles";
 import { useVistaPrevia } from "../../auth/vistaPrevia";
+import { SelectorPerfil } from "../selector-perfil/SelectorPerfil";
 import styles from "./Menu.module.css";
 
 type Enlace = {
@@ -11,28 +18,185 @@ type Enlace = {
   icon: string;
 };
 
-const enlacesPrincipales: Enlace[] = [
-  { href: "/dashboard", label: "Inicio", icon: "⌂" },
-  { href: "/proyectos", label: "Proyectos", icon: "▤" },
-  { href: "/escaner", label: "Escáner", icon: "▦" },
-  { href: "/offline", label: "Modo offline", icon: "⌁" },
-];
+type Grupo = {
+  label: string;
+  enlaces: Enlace[];
+};
 
-const enlacesGestion: Enlace[] = [
-  { href: "/participantes", label: "Participantes", icon: "♧" },
-  { href: "/quorum", label: "Quórum", icon: "◉" },
-  { href: "/encuestas", label: "Encuestas", icon: "✓" },
-  { href: "/reportes", label: "Reportes", icon: "▥" },
-  { href: "/historial", label: "Historial", icon: "◷" },
-  { href: "/perfil", label: "Perfil", icon: "♙" },
-];
+type ContextoMenu = "real" | "demo" | "vista-previa";
 
-const enlacesMovilesPrincipales: Enlace[] = [
-  { href: "/dashboard", label: "Inicio", icon: "⌂" },
-  { href: "/proyectos", label: "Proyectos", icon: "▤" },
-  { href: "/escaner", label: "Escáner", icon: "▦" },
-  { href: "/offline", label: "Offline", icon: "⌁" },
-];
+function construirGrupos(
+  rol: RolSyncPass,
+  contexto: ContextoMenu
+): Grupo[] {
+  const esReal = contexto === "real";
+
+  if (rol === "estudiante") {
+    return [
+      {
+        label: "General",
+        enlaces: [
+          {
+            href: "/estudiante/dashboard",
+            label: "Inicio personal",
+            icon: "⌂",
+          },
+          ...(esReal
+            ? [
+                {
+                  href: "/proyectos",
+                  label: "Proyectos",
+                  icon: "▤",
+                },
+              ]
+            : []),
+          { href: "/encuestas", label: "Encuestas", icon: "✓" },
+          { href: "/escaner", label: "Escáner QR", icon: "▦" },
+          { href: "/offline", label: "Modo offline", icon: "⌁" },
+        ],
+      },
+      {
+        label: "Estudiante",
+        enlaces: [
+          {
+            href: "/estudiante/mis-cursos",
+            label: "Mis cursos",
+            icon: "📚",
+          },
+          {
+            href: "/estudiante/mi-asistencia",
+            label: "Mi asistencia",
+            icon: "✓",
+          },
+          {
+            href: "/estudiante/perfil",
+            label: "Mi perfil",
+            icon: "👤",
+          },
+        ],
+      },
+    ];
+  }
+
+  if (rol === "profesor") {
+    return [
+      {
+        label: "General",
+        enlaces: [
+          {
+            href: "/docente/dashboard",
+            label: "Inicio docente",
+            icon: "⌂",
+          },
+          ...(esReal
+            ? [
+                {
+                  href: "/proyectos",
+                  label: "Proyectos",
+                  icon: "▤",
+                },
+              ]
+            : []),
+          { href: "/encuestas", label: "Encuestas", icon: "✓" },
+          { href: "/offline", label: "Modo offline", icon: "⌁" },
+        ],
+      },
+      {
+        label: "Docente",
+        enlaces: [
+          {
+            href: "/docente/cursos",
+            label: "Administrar cursos",
+            icon: "📚",
+          },
+          {
+            href: "/docente/estudiantes",
+            label: "Estudiantes asignados",
+            icon: "👥",
+          },
+          {
+            href: "/docente/asistencia",
+            label: "Gestionar asistencia",
+            icon: "✓",
+          },
+          {
+            href: "/reportes",
+            label: "Reportes",
+            icon: "▥",
+          },
+        ],
+      },
+    ];
+  }
+
+  if (rol === "coordinador") {
+    return [
+      {
+        label: "Coordinación",
+        enlaces: [
+          {
+            href: "/coordinador/dashboard",
+            label: "Dashboard",
+            icon: "⌂",
+          },
+          {
+            href: "/coordinador/cursos",
+            label: "Cursos del ámbito",
+            icon: "📚",
+          },
+          {
+            href: "/coordinador/docentes",
+            label: "Docentes",
+            icon: "👥",
+          },
+          {
+            href: "/coordinador/asistencia",
+            label: "Asistencia",
+            icon: "✓",
+          },
+          {
+            href: "/reportes",
+            label: "Reportes",
+            icon: "▥",
+          },
+        ],
+      },
+    ];
+  }
+
+  return [
+    {
+      label: "Administración",
+      enlaces: [
+        {
+          href: "/administrador/dashboard",
+          label: "Dashboard",
+          icon: "⌂",
+        },
+        {
+          href: "/administrador/usuarios",
+          label: "Usuarios",
+          icon: "👤",
+        },
+        {
+          href: "/administrador/roles",
+          label: "Roles",
+          icon: "🛡️",
+        },
+        {
+          href: "/administrador/cursos",
+          label: "Cursos",
+          icon: "📚",
+        },
+        {
+          href: "/administrador/configuracion",
+          label: "Configuración",
+          icon: "⚙️",
+        },
+      ],
+    },
+  ];
+}
 
 function esRutaActiva(location: string, href: string): boolean {
   if (location === href) {
@@ -47,15 +211,45 @@ function esRutaActiva(location: string, href: string): boolean {
 }
 
 export function Menu() {
-  const [location] = useLocation();
+  const auth = useAuth();
+  const [location, setLocation] = useLocation();
   const [masAbierto, setMasAbierto] = useState(false);
   const { esModoDemo, limpiarRolDemo, rolDemo } = useDemoRole();
-  const { esDocente: esDocenteReal, esEstudiante: esEstudianteReal } = useRol();
-  const { activo: vistaPreviaActiva, rol: rolVistaPrevia, salir: salirVistaPrevia } = useVistaPrevia();
+  const { roles, rolActivo } = usePerfilActivo();
+  const {
+    activo: vistaPreviaActiva,
+    rol: rolVistaPrevia,
+    salir: salirVistaPrevia,
+  } = useVistaPrevia();
   const isDev = import.meta.env.DEV;
-  
-  const esDocente = vistaPreviaActiva ? rolVistaPrevia === "docente" : (esDocenteReal || rolDemo === "docente");
-  const esEstudiante = vistaPreviaActiva ? rolVistaPrevia === "estudiante" : (esEstudianteReal || rolDemo === "estudiante");
+
+  const contexto: ContextoMenu =
+    vistaPreviaActiva && rolVistaPrevia
+      ? "vista-previa"
+      : roles.length === 0 && esModoDemo && rolDemo
+        ? "demo"
+        : "real";
+
+  const rolMenu: RolSyncPass | null =
+    contexto === "vista-previa"
+      ? rolVistaPrevia
+      : contexto === "demo"
+        ? rolDemo
+        : rolActivo;
+
+  const esReal = contexto === "real" && roles.length > 0;
+  const inicio = rolMenu ? ROLES[rolMenu].rutaInicio : "/";
+  const nombre = obtenerNombreUsuario(auth.user?.profile);
+  const grupos = rolMenu ? construirGrupos(rolMenu, contexto) : [];
+
+  const todosLosEnlaces = grupos
+    .flatMap((grupo) => grupo.enlaces)
+    .filter(
+      (enlace, indice, arreglo) =>
+        arreglo.findIndex((item) => item.href === enlace.href) === indice
+    );
+
+  const enlacesMoviles = todosLosEnlaces.slice(0, 4);
 
   useEffect(() => {
     if (!masAbierto) {
@@ -82,93 +276,115 @@ export function Menu() {
       <Link
         key={enlace.href}
         href={enlace.href}
-        className={`${styles.link} ${
-          active ? styles.active : ""
-        }`}
+        className={`${styles.link} ${active ? styles.active : ""}`}
         aria-current={active ? "page" : undefined}
+        onClick={() => setMasAbierto(false)}
       >
-        <span className={styles.icon}>{enlace.icon}</span>
+        <span className={styles.icon} aria-hidden="true">
+          {enlace.icon}
+        </span>
         <span>{enlace.label}</span>
       </Link>
     );
   }
 
+  const salirDeVistaPrevia = () => {
+    salirVistaPrevia();
+    setLocation("/");
+  };
+
+  const salirDeDemostracion = () => {
+    limpiarRolDemo();
+    setLocation("/");
+  };
+
   return (
     <>
       <aside className={styles.sidebar}>
-        <Link href="/dashboard" className={styles.brand}>
+        <Link href={inicio} className={styles.brand}>
           <span className={styles.brandIcon}>▣</span>
           SyncPass
         </Link>
 
-        <p className={styles.description}>
-          PLATAFORMA INSTITUCIONAL
-        </p>
+        <p className={styles.description}>PLATAFORMA INSTITUCIONAL</p>
 
-        <nav
-          className={styles.desktopNav}
-          aria-label="Navegación principal"
-        >
-          <div className={styles.group}>
-            <p className={styles.groupLabel}>Principal</p>
-            <ul className={styles.links}>
-              {enlacesPrincipales.map((enlace) => (
-                <li key={enlace.href}>{renderEnlace(enlace)}</li>
-              ))}
-            </ul>
-          </div>
-
-          {esDocente && (
-            <div className={styles.group}>
-              <p className={styles.groupLabel}>Docente</p>
+        <nav className={styles.desktopNav} aria-label="Navegación principal">
+          {grupos.map((grupo) => (
+            <div className={styles.group} key={grupo.label}>
+              <p className={styles.groupLabel}>{grupo.label}</p>
               <ul className={styles.links}>
-                <li><Link href="/docente/dashboard" className={`${styles.link} ${esRutaActiva(location, "/docente/dashboard") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/docente/dashboard") ? "page" : undefined}><span className={styles.icon}>📊</span><span>Dashboard docente</span></Link></li>
-                <li><Link href="/docente/cursos" className={`${styles.link} ${esRutaActiva(location, "/docente/cursos") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/docente/cursos") ? "page" : undefined}><span className={styles.icon}>📚</span><span>Administrar cursos</span></Link></li>
-                <li><Link href="/docente/estudiantes" className={`${styles.link} ${esRutaActiva(location, "/docente/estudiantes") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/docente/estudiantes") ? "page" : undefined}><span className={styles.icon}>👥</span><span>Administrar estudiantes</span></Link></li>
-                <li><Link href="/docente/asistencia" className={`${styles.link} ${esRutaActiva(location, "/docente/asistencia") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/docente/asistencia") ? "page" : undefined}><span className={styles.icon}>✓</span><span>Gestionar asistencia</span></Link></li>
+                {grupo.enlaces.map((enlace) => (
+                  <li key={enlace.href}>{renderEnlace(enlace)}</li>
+                ))}
               </ul>
             </div>
-          )}
-
-          {esEstudiante && (
-            <div className={styles.group}>
-              <p className={styles.groupLabel}>Estudiante</p>
-              <ul className={styles.links}>
-                <li><Link href="/estudiante/dashboard" className={`${styles.link} ${esRutaActiva(location, "/estudiante/dashboard") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/estudiante/dashboard") ? "page" : undefined}><span className={styles.icon}>🏠</span><span>Mi inicio</span></Link></li>
-                <li><Link href="/estudiante/mis-cursos" className={`${styles.link} ${esRutaActiva(location, "/estudiante/mis-cursos") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/estudiante/mis-cursos") ? "page" : undefined}><span className={styles.icon}>📚</span><span>Mis cursos</span></Link></li>
-                <li><Link href="/estudiante/mi-asistencia" className={`${styles.link} ${esRutaActiva(location, "/estudiante/mi-asistencia") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/estudiante/mi-asistencia") ? "page" : undefined}><span className={styles.icon}>✓</span><span>Mi asistencia</span></Link></li>
-                <li><Link href="/estudiante/perfil" className={`${styles.link} ${esRutaActiva(location, "/estudiante/perfil") ? styles.active : ""}`} aria-current={esRutaActiva(location, "/estudiante/perfil") ? "page" : undefined}><span className={styles.icon}>👤</span><span>Mi perfil</span></Link></li>
-              </ul>
-            </div>
-          )}
-
-          <div className={styles.group}>
-            <p className={styles.groupLabel}>Opciones generales</p>
-            <ul className={styles.links}>
-              {enlacesGestion.map((enlace) => (
-                <li key={enlace.href}>{renderEnlace(enlace)}</li>
-              ))}
-            </ul>
-          </div>
+          ))}
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <strong>{esDocente ? "Docente · Coordinador" : esEstudiante ? "Estudiante" : "Usuario"}</strong>
-          <span>Duoc UC · SyncPass</span>
-          {(isDev || import.meta.env.VITE_ENABLE_VISTA_PREVIA === "true") && (
-            <Link href="/vista-previa" style={{ display: "block", marginTop: "0.5rem", color: "#fff", textDecoration: "underline", fontSize: "0.75rem" }}>
-              Vista previa de roles
-            </Link>
+          <strong>
+            {rolMenu ? ROLES[rolMenu].etiqueta : "Sin perfil activo"}
+          </strong>
+          <span>
+            {esReal
+              ? nombre
+              : contexto === "demo"
+                ? "Modo demostración"
+                : "Vista previa aislada"}
+          </span>
+
+          {esReal && <SelectorPerfil variante="oscuro" />}
+
+          {!esReal && rolMenu && (
+            <span className={styles.footerNote}>
+              Datos ficticios · sin permisos reales
+            </span>
           )}
-          {vistaPreviaActiva && (
-            <button type="button" onClick={() => { salirVistaPrevia(); window.location.href = "/"; }} style={{ display: "block", marginTop: "0.25rem", background: "transparent", border: "none", color: "#fff", textDecoration: "underline", fontSize: "0.75rem", cursor: "pointer", padding: 0 }}>
+
+          {(isDev || import.meta.env.VITE_ENABLE_VISTA_PREVIA === "true") &&
+            esReal && (
+              <Link href="/vista-previa" className={styles.footerLink}>
+                Vista previa de roles
+              </Link>
+            )}
+
+          {contexto === "vista-previa" && (
+            <button
+              type="button"
+              className={styles.footerButton}
+              onClick={salirDeVistaPrevia}
+            >
               Salir de vista previa
             </button>
           )}
-          {esModoDemo && (esDocente || esEstudiante) && !vistaPreviaActiva && (
-            <Link href="/seleccion-rol" onClick={() => { limpiarRolDemo(); window.location.href = "/seleccion-rol"; }} style={{ display: "block", marginTop: "0.25rem", color: "#fff", textDecoration: "underline", fontSize: "0.75rem" }}>
-              Cambiar vista DEMO
-            </Link>
+
+          {contexto === "demo" && (
+            <>
+              <Link
+                href="/seleccion-rol"
+                className={styles.footerLink}
+                onClick={() => setMasAbierto(false)}
+              >
+                Cambiar vista de demostración
+              </Link>
+              <button
+                type="button"
+                className={styles.footerButton}
+                onClick={salirDeDemostracion}
+              >
+                Salir de la demostración
+              </button>
+            </>
+          )}
+
+          {esReal && (
+            <button
+              type="button"
+              className={styles.footerButton}
+              onClick={() => void auth.signoutRedirect()}
+            >
+              Cerrar sesión
+            </button>
           )}
         </div>
       </aside>
@@ -194,7 +410,11 @@ export function Menu() {
         <div className={styles.moreCabecera}>
           <div>
             <strong>Más secciones</strong>
-            <span>Gestión y seguimiento</span>
+            <span>
+              {rolMenu
+                ? `Perfil: ${ROLES[rolMenu].etiqueta}`
+                : "Navegación SyncPass"}
+            </span>
           </div>
 
           <button
@@ -207,9 +427,15 @@ export function Menu() {
           </button>
         </div>
 
+        {esReal && (
+          <div className={styles.moreSelector}>
+            <SelectorPerfil variante="claro" />
+          </div>
+        )}
+
         <nav aria-label="Secciones adicionales">
           <ul className={styles.moreLinks}>
-            {enlacesGestion.map((enlace) => {
+            {todosLosEnlaces.map((enlace) => {
               const active = esRutaActiva(location, enlace.href);
 
               return (
@@ -232,13 +458,17 @@ export function Menu() {
             })}
           </ul>
         </nav>
+
+        {!esReal && (
+          <p className={styles.moreNota}>
+            Las vistas de demostración y vista previa no habilitan operaciones
+            protegidas.
+          </p>
+        )}
       </section>
 
-      <nav
-        className={styles.mobileNavigation}
-        aria-label="Navegación móvil"
-      >
-        {enlacesMovilesPrincipales.map((enlace) => {
+      <nav className={styles.mobileNavigation} aria-label="Navegación móvil">
+        {enlacesMoviles.map((enlace) => {
           const active = esRutaActiva(location, enlace.href);
 
           return (
@@ -250,7 +480,7 @@ export function Menu() {
               }`}
               aria-current={active ? "page" : undefined}
             >
-              <span className={styles.mobileIcon}>
+              <span className={styles.mobileIcon} aria-hidden="true">
                 {enlace.icon}
               </span>
               <span>{enlace.label}</span>
