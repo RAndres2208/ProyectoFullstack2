@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from "react";
 import {
   ErrorProyectos,
@@ -19,9 +20,8 @@ type ResultadoConsulta = {
 };
 
 /**
- * Centraliza la carga del listado de proyectos. No mezcla datos locales:
- * si la consulta falla, el estado queda en error y la vista debe ofrecer
- * reintentar o activar el modo demostración de forma explícita.
+ * Centraliza la carga del listado de proyectos.
+ * No mezcla datos locales con respuestas reales de la API.
  */
 export function useProyectosApi(
   habilitado: boolean,
@@ -31,7 +31,11 @@ export function useProyectosApi(
   const [resultado, setResultado] =
     useState<ResultadoConsulta | null>(null);
 
-  const clave = `${intento}::${accessToken ? huellaToken(accessToken) : "sin-token"}`;
+  const clave = `${intento}::${
+    accessToken
+      ? huellaToken(accessToken)
+      : "sin-token"
+  }`;
 
   useEffect(() => {
     if (!habilitado || !accessToken) {
@@ -42,9 +46,7 @@ export function useProyectosApi(
 
     obtenerProyectosApi(accessToken)
       .then((datos) => {
-        if (cancelado) {
-          return;
-        }
+        if (cancelado) return;
 
         setResultado({
           clave,
@@ -53,9 +55,7 @@ export function useProyectosApi(
         });
       })
       .catch((fallo: unknown) => {
-        if (cancelado) {
-          return;
-        }
+        if (cancelado) return;
 
         setResultado({
           clave,
@@ -111,7 +111,9 @@ export function useProyectosApi(
 
   return {
     proyectos: resultado.proyectos,
-    estado: (resultado.error ? "error" : "exito") as EstadoProyectosApi,
+    estado: (
+      resultado.error ? "error" : "exito"
+    ) as EstadoProyectosApi,
     error: resultado.error,
     recargar,
   };

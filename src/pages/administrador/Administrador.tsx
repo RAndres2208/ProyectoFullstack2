@@ -1,3 +1,4 @@
+
 import { Link } from "wouter";
 import { useAuth } from "react-oidc-context";
 import { obtenerNombreUsuario, ORDEN_ROLES } from "../../auth/roles";
@@ -39,11 +40,26 @@ const modulos = [
 ];
 
 const estadoModulos = [
-  { modulo: "Registro administrativo de usuarios", estado: "Requiere confirmación" },
-  { modulo: "Listado de usuarios", estado: "Sin endpoint" },
-  { modulo: "Modificación o baja de cuentas", estado: "Sin endpoint" },
-  { modulo: "Asignación de roles", estado: "Gestionada en Cognito" },
-  { modulo: "Configuración general", estado: "Sin endpoint" },
+  {
+    modulo: "Registro administrativo de usuarios",
+    estado: "Pendiente de integrar formulario",
+  },
+  {
+    modulo: "Listado de usuarios",
+    estado: "Sin endpoint",
+  },
+  {
+    modulo: "Modificación o baja de cuentas",
+    estado: "Sin endpoint",
+  },
+  {
+    modulo: "Asignación de roles a cuentas existentes",
+    estado: "Sin endpoint",
+  },
+  {
+    modulo: "Configuración general",
+    estado: "Sin endpoint",
+  },
 ];
 
 export function DashboardAdministrador() {
@@ -59,8 +75,12 @@ export function DashboardAdministrador() {
     >
       <section className={dashboardStyles.welcome}>
         <div>
-          <p className={dashboardStyles.welcomeLabel}>Bienvenido/a,</p>
-          <h2 className={dashboardStyles.welcomeName}>{nombre}</h2>
+          <p className={dashboardStyles.welcomeLabel}>
+            Bienvenido/a,
+          </p>
+          <h2 className={dashboardStyles.welcomeName}>
+            {nombre}
+          </h2>
           <p className={dashboardStyles.welcomeSubtitle}>
             Administración de usuarios, roles, cursos y configuración
           </p>
@@ -68,16 +88,18 @@ export function DashboardAdministrador() {
       </section>
 
       <AvisoDemo>
-        Esta vista no ejecuta operaciones administrativas reales. Los
-        indicadores son de demostración y cada módulo informa si cuenta o no
-        con un endpoint disponible.
+        Los indicadores de este panel son de demostración.
+        Los módulos administrativos indican cuáles tienen
+        integración disponible y cuáles continúan pendientes.
       </AvisoDemo>
 
       <section className={dashboardStyles.stats}>
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>👥</div>
           <div>
-            <p className={dashboardStyles.statLabel}>Usuarios de referencia</p>
+            <p className={dashboardStyles.statLabel}>
+              Usuarios de referencia
+            </p>
             <p className={dashboardStyles.statValue}>
               {estudiantesDemo.length}
             </p>
@@ -87,7 +109,9 @@ export function DashboardAdministrador() {
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>🛡️</div>
           <div>
-            <p className={dashboardStyles.statLabel}>Roles del sistema</p>
+            <p className={dashboardStyles.statLabel}>
+              Roles del sistema
+            </p>
             <p className={dashboardStyles.statValue}>
               {ORDEN_ROLES.length}
             </p>
@@ -97,7 +121,9 @@ export function DashboardAdministrador() {
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>📚</div>
           <div>
-            <p className={dashboardStyles.statLabel}>Cursos de referencia</p>
+            <p className={dashboardStyles.statLabel}>
+              Cursos de referencia
+            </p>
             <p className={dashboardStyles.statValue}>
               {cursosDemo.length}
             </p>
@@ -107,7 +133,9 @@ export function DashboardAdministrador() {
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>⚙️</div>
           <div>
-            <p className={dashboardStyles.statLabel}>Módulos por integrar</p>
+            <p className={dashboardStyles.statLabel}>
+              Módulos por integrar
+            </p>
             <p className={dashboardStyles.statValue}>4</p>
           </div>
         </article>
@@ -117,7 +145,9 @@ export function DashboardAdministrador() {
         <header className={dashboardStyles.sectionHeader}>
           <div>
             <h3>Módulos de administración</h3>
-            <p>Cada módulo indica claramente su estado de disponibilidad</p>
+            <p>
+              Cada módulo indica claramente su estado de disponibilidad
+            </p>
           </div>
         </header>
 
@@ -128,7 +158,10 @@ export function DashboardAdministrador() {
               href={modulo.ruta}
               className={dashboardStyles.actionCard}
             >
-              <span className={dashboardStyles.actionIcon} aria-hidden="true">
+              <span
+                className={dashboardStyles.actionIcon}
+                aria-hidden="true"
+              >
                 {modulo.icono}
               </span>
               <span>{modulo.nombre}</span>
@@ -142,7 +175,9 @@ export function DashboardAdministrador() {
         <header className={dashboardStyles.sectionHeader}>
           <div>
             <h3>Estado de integración</h3>
-            <p>Contratos administrativos confirmados para el frontend</p>
+            <p>
+              Contratos administrativos confirmados para el frontend
+            </p>
           </div>
         </header>
 
@@ -159,7 +194,9 @@ export function DashboardAdministrador() {
                 <tr key={item.modulo}>
                   <td>{item.modulo}</td>
                   <td>
-                    <Etiqueta tono="advertencia">{item.estado}</Etiqueta>
+                    <Etiqueta tono="advertencia">
+                      {item.estado}
+                    </Etiqueta>
                   </td>
                 </tr>
               ))}
@@ -169,11 +206,11 @@ export function DashboardAdministrador() {
       </section>
 
       <Aviso tono="advertencia">
-        <strong>Registro de usuarios:</strong> el backend contempla una
-        operación administrativa de alta, pero esta interfaz no la ejecutará
-        hasta confirmar el contrato, las validaciones y los permisos
-        requeridos. Tampoco se asume la existencia de endpoints para listar,
-        modificar o eliminar cuentas.
+        <strong>Registro de usuarios:</strong> el backend dispone de
+        POST /api/auth/registro, reservado a Administrador.
+        La interfaz de registro todavía está pendiente de integración.
+        No existen endpoints confirmados para listar, modificar
+        o eliminar cuentas existentes.
       </Aviso>
     </PageLayout>
   );
@@ -201,7 +238,8 @@ function ModuloPendiente({
       demo="DUOC UC · ADMINISTRACIÓN"
     >
       <Aviso tono="advertencia">
-        <strong>Módulo pendiente de integración.</strong> {motivo}
+        <strong>Módulo pendiente de integración.</strong>{" "}
+        {motivo}
       </Aviso>
 
       <section className={dashboardStyles.section}>
@@ -212,20 +250,37 @@ function ModuloPendiente({
       </section>
 
       <Aviso tono="info">
-        No se muestran formularios ni botones de guardado para evitar
-        simular acciones que no llegarían a la API.
+        No se muestran formularios ni botones de guardado
+        para evitar simular acciones que no llegarían a la API.
       </Aviso>
     </PageLayout>
   );
 }
 
-export function UsuariosAdministrador() {
+type UsuariosAdministradorProps = {
+  soloLectura?: boolean;
+};
+
+export function UsuariosAdministrador({
+  soloLectura = false,
+}: UsuariosAdministradorProps) {
+  if (soloLectura) {
+    return (
+      <ModuloPendiente
+        titulo="Gestión de usuarios — Demostración"
+        descripcion="Vista previa del módulo administrativo"
+        motivo="El registro de usuarios está deshabilitado en modo demostración."
+        detalle="Esta vista no permite registrar cuentas reales en AWS Cognito."
+      />
+    );
+  }
+
   return (
     <ModuloPendiente
       titulo="Gestión de usuarios"
       descripcion="Administración de cuentas institucionales"
-      motivo="La API no expone endpoints confirmados para listar, modificar o eliminar usuarios desde esta interfaz."
-      detalle="El listado de cuentas y sus acciones de edición o baja permanecen pendientes hasta contar con un contrato de API y permisos verificados."
+      motivo="El registro administrativo está disponible en el backend, pero el formulario todavía no se encuentra integrado."
+      detalle="La API permite crear cuentas mediante POST /api/auth/registro. El listado, la modificación y la eliminación de cuentas siguen pendientes porque no existen endpoints confirmados."
     />
   );
 }
@@ -235,8 +290,8 @@ export function RolesAdministrador() {
     <ModuloPendiente
       titulo="Roles y permisos"
       descripcion="Asignación de grupos de Cognito"
-      motivo="La asignación de roles se gestiona actualmente en AWS Cognito y no existe un endpoint de administración desde SyncPass."
-      detalle="Cualquier cambio de grupo debe realizarse en Cognito. Esta pantalla no ofrece acciones de escritura ni simula la asignación de permisos."
+      motivo="No existe un endpoint confirmado para modificar los roles de cuentas existentes."
+      detalle="El backend permite asignar roles durante el registro de usuarios. La modificación posterior de grupos requiere una funcionalidad adicional."
     />
   );
 }

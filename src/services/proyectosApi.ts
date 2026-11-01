@@ -1,55 +1,66 @@
 /**
- * Cliente HTTP del listado de proyectos de SyncPass.
+ * Cliente HTTP de proyectos de SyncPass.
  *
  * Contrato confirmado:
- * GET {VITE_API_URL}/api/proyectos
- * Authorization: Bearer <access_token de Cognito>
+ * - GET    {VITE_API_URL}/api/proyectos       (4 roles)
+ * - GET    {VITE_API_URL}/api/proyectos/{id}  (4 roles)
+ * - POST   {VITE_API_URL}/api/proyectos       (solo Administrador)
+ * - PUT    {VITE_API_URL}/api/proyectos/{id}  (solo Administrador)
+ * - DELETE {VITE_API_URL}/api/proyectos/{id}  (solo Administrador, 204 sin cuerpo)
+ *
+ * ProyectoResponse: { id, nombre, descripcion, estado }
+ * El backend NO incluye la cantidad de participantes en este DTO.
  *
  * El token nunca se registra en consola ni se incluye en mensajes de error.
  */
 
+import {
+  ErrorApi,
+  solicitarApi,
+  type TipoErrorApi,
+} from "./apiClient";
+
 export type ProyectoApi = {
   id: number;
   nombre: string;
+  descripcion: string | null;
   estado: string;
-  participantes: number;
 };
 
-export type TipoErrorProyectos =
-  | "configuracion"
-  | "sesion"
-  | "permisos"
-  | "no-encontrado"
-  | "servidor"
-  | "red"
-  | "tiempo"
-  | "respuesta"
-  | "cancelado";
+export type EstadoProyectoSolicitud =
+  | "ACTIVO"
+  | "INACTIVO"
+  | "FINALIZADO";
 
-export class ErrorProyectos extends Error {
-  readonly tipo: TipoErrorProyectos;
-  readonly status?: number;
+export type ProyectoSolicitud = {
+  nombre: string;
+  descripcion: string | null;
+  estado: EstadoProyectoSolicitud;
+};
 
-  constructor(
-    tipo: TipoErrorProyectos,
-    mensaje: string,
-    status?: number
-  ) {
-    super(mensaje);
+export type TipoErrorProyectos = TipoErrorApi;
+
+/**
+ * Se conserva el nombre ErrorProyectos por compatibilidad con la interfaz
+ * y las pruebas existentes. Todos los errores del cliente se convierten a
+ * este tipo antes de salir del servicio.
+ */
+export class ErrorProyectos extends ErrorApi {
+  constructor(tipo: TipoErrorProyectos, mensaje: string, status?: number) {
+    super(tipo, mensaje, status);
     this.name = "ErrorProyectos";
-    this.tipo = tipo;
-    this.status = status;
   }
 }
 
-const TIEMPO_LIMITE_MS = 15000;
+const ESTADOS_VALIDOS: EstadoProyectoSolicitud[] = [
+  "ACTIVO",
+  "INACTIVO",
+  "FINALIZADO",
+];
 
-// Evita disparar la misma consulta dos veces mientras está en curso.
+// Evita disparar la misma consulta de listado dos veces mientras está en curso.
 // La clave se mantiene solo en memoria, usa una huella y nunca se imprime.
-const solicitudesEnCurso = new Map<
-  string,
-  Promise<ProyectoApi[]>
->();
+const solicitudesEnCurso = new Map<string, Promise<ProyectoApi[]>>();
 
 export function huellaToken(token: string): string {
   let hash = 0;
@@ -61,9 +72,7 @@ export function huellaToken(token: string): string {
   return `${token.length}-${hash}`;
 }
 
-function esObjeto(
-  valor: unknown
-): valor is Record<string, unknown> {
+function esObjeto(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null;
 }
 
@@ -75,13 +84,9 @@ function validarProyecto(valor: unknown): ProyectoApi {
     );
   }
 
-  const { id, nombre, estado, participantes } = valor;
+  const { id, nombre, descripcion, estado } = valor;
 
-  if (
-    typeof id !== "number" ||
-    !Number.isInteger(id) ||
-    id <= 0
-  ) {
+  if (typeof id !== "number" || !Number.isInteger(id) || id <= 0) {
     throw new ErrorProyectos(
       "respuesta",
       "SyncPass API devolvió un proyecto sin un identificador numérico válido."
@@ -103,29 +108,37 @@ function validarProyecto(valor: unknown): ProyectoApi {
   }
 
   if (
-    typeof participantes !== "number" ||
-    !Number.isFinite(participantes) ||
-    participantes < 0
+    descripcion !== undefined &&
+    descripcion !== null &&
+    typeof descripcion !== "string"
   ) {
     throw new ErrorProyectos(
       "respuesta",
-      "SyncPass API devolvió una cantidad de participantes inválida."
+      "SyncPass API devolvió una descripción de proyecto con un formato inesperado."
     );
   }
 
   return {
     id,
     nombre: nombre.trim(),
+    descripcion:
+      typeof descripcion === "string" ? descripcion.trim() || null : null,
     estado: estado.trim(),
-    participantes,
   };
 }
 
-function normalizarLista(proyectos: ProyectoApi[]): ProyectoApi[] {
+function validarLista(valor: unknown): ProyectoApi[] {
+  if (!Array.isArray(valor)) {
+    throw new ErrorProyectos(
+      "respuesta",
+      "La respuesta de proyectos no contiene un listado válido."
+    );
+  }
+
   // El backend podría repetir un identificador; el listado debe ser único.
   const porId = new Map<number, ProyectoApi>();
 
-  for (const proyecto of proyectos) {
+  for (const proyecto of valor.map(validarProyecto)) {
     if (!porId.has(proyecto.id)) {
       porId.set(proyecto.id, proyecto);
     }
@@ -134,172 +147,64 @@ function normalizarLista(proyectos: ProyectoApi[]): ProyectoApi[] {
   return Array.from(porId.values());
 }
 
-function errorPorEstado(status: number): ErrorProyectos {
-  if (status === 401) {
-    return new ErrorProyectos(
-      "sesion",
-      "Tu sesión de Cognito expiró o no es válida. Vuelve a iniciar sesión para consultar los proyectos.",
-      status
+function validarSolicitud(datos: ProyectoSolicitud): ProyectoSolicitud {
+  const nombre = datos.nombre.trim();
+  const descripcion =
+    typeof datos.descripcion === "string"
+      ? datos.descripcion.trim() || null
+      : null;
+
+  if (!nombre) {
+    throw new ErrorProyectos(
+      "solicitud",
+      "El nombre del proyecto es obligatorio."
     );
   }
 
-  if (status === 403) {
-    return new ErrorProyectos(
-      "permisos",
-      "No tienes permisos para consultar los proyectos con esta cuenta.",
-      status
+  if (!ESTADOS_VALIDOS.includes(datos.estado)) {
+    throw new ErrorProyectos(
+      "solicitud",
+      "El estado del proyecto debe ser ACTIVO, INACTIVO o FINALIZADO."
     );
   }
 
-  if (status === 404) {
-    return new ErrorProyectos(
-      "no-encontrado",
-      "El servicio de proyectos no está disponible en la ruta configurada.",
-      status
-    );
+  return { nombre, descripcion, estado: datos.estado };
+}
+
+function comoErrorProyectos(error: unknown): ErrorProyectos {
+  if (error instanceof ErrorProyectos) {
+    return error;
   }
 
-  if (status >= 500) {
-    return new ErrorProyectos(
-      "servidor",
-      "El servidor de SyncPass tuvo un problema. Intenta nuevamente en unos instantes.",
-      status
-    );
+  if (error instanceof ErrorApi) {
+    return new ErrorProyectos(error.tipo, error.message, error.status);
   }
 
   return new ErrorProyectos(
-    "servidor",
-    "SyncPass API rechazó la consulta de proyectos.",
-    status
+    "red",
+    "No fue posible consultar los proyectos."
   );
 }
 
-async function ejecutarSolicitud(
-  url: string,
-  accessToken: string,
-  opciones: {
-    signal?: AbortSignal;
-    timeoutMs?: number;
-  }
-): Promise<ProyectoApi[]> {
-  const controlador = new AbortController();
-  let motivoCancelacion: "tiempo" | "externo" | null = null;
-
-  const temporizador = window.setTimeout(() => {
-    motivoCancelacion = "tiempo";
-    controlador.abort();
-  }, opciones.timeoutMs ?? TIEMPO_LIMITE_MS);
-
-  const alCancelar = () => {
-    motivoCancelacion = "externo";
-    controlador.abort();
-  };
-
-  if (opciones.signal) {
-    if (opciones.signal.aborted) {
-      alCancelar();
-    } else {
-      opciones.signal.addEventListener("abort", alCancelar, {
-        once: true,
-      });
-    }
-  }
-
-  try {
-    const respuesta = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-      },
-      cache: "no-store",
-      signal: controlador.signal,
-    });
-
-    if (!respuesta.ok) {
-      throw errorPorEstado(respuesta.status);
-    }
-
-    let json: unknown;
-
-    try {
-      json = await respuesta.json();
-    } catch {
-      throw new ErrorProyectos(
-        "respuesta",
-        "El servidor respondió con un formato que SyncPass no puede leer."
-      );
-    }
-
-    if (
-      !esObjeto(json) ||
-      json.success !== true ||
-      !Array.isArray(json.data)
-    ) {
-      throw new ErrorProyectos(
-        "respuesta",
-        "La respuesta de SyncPass API no cumple el contrato esperado."
-      );
-    }
-
-    return normalizarLista(json.data.map(validarProyecto));
-  } catch (error) {
-    if (error instanceof ErrorProyectos) {
-      throw error;
-    }
-
-    if (error instanceof Error && error.name === "AbortError") {
-      if (motivoCancelacion === "tiempo") {
-        throw new ErrorProyectos(
-          "tiempo",
-          "La consulta de proyectos tardó demasiado. Verifica la conexión y vuelve a intentarlo."
-        );
-      }
-
-      throw new ErrorProyectos(
-        "cancelado",
-        "La consulta de proyectos fue cancelada."
-      );
-    }
-
+function validarId(id: number): void {
+  if (!Number.isInteger(id) || id <= 0) {
     throw new ErrorProyectos(
-      "red",
-      "No fue posible conectar con SyncPass. Verifica tu conexión o si el backend está disponible."
+      "solicitud",
+      "El identificador del proyecto debe ser un número entero positivo."
     );
-  } finally {
-    window.clearTimeout(temporizador);
-
-    if (opciones.signal) {
-      opciones.signal.removeEventListener("abort", alCancelar);
-    }
   }
 }
 
+type OpcionesConsulta = {
+  signal?: AbortSignal;
+  timeoutMs?: number;
+};
+
 export async function obtenerProyectosApi(
   accessToken: string,
-  opciones: {
-    signal?: AbortSignal;
-    timeoutMs?: number;
-  } = {}
+  opciones: OpcionesConsulta = {}
 ): Promise<ProyectoApi[]> {
-  if (!accessToken.trim()) {
-    throw new ErrorProyectos(
-      "sesion",
-      "No hay una sesión de Cognito disponible para consultar los proyectos."
-    );
-  }
-
-  const apiUrl = import.meta.env.VITE_API_URL;
-
-  if (typeof apiUrl !== "string" || !apiUrl.trim()) {
-    throw new ErrorProyectos(
-      "configuracion",
-      "La URL de SyncPass API no está configurada. Revisa VITE_API_URL."
-    );
-  }
-
-  const url = `${apiUrl.replace(/\/$/, "")}/api/proyectos`;
-  const clave = `${url}::${huellaToken(accessToken)}`;
+  const clave = `lista::${accessToken ? huellaToken(accessToken) : "sin-token"}`;
 
   if (!opciones.signal) {
     const solicitudExistente = solicitudesEnCurso.get(clave);
@@ -311,17 +216,118 @@ export async function obtenerProyectosApi(
 
   let solicitud: Promise<ProyectoApi[]>;
 
-  solicitud = ejecutarSolicitud(url, accessToken, opciones).finally(
-    () => {
+  solicitud = solicitarApi<ProyectoApi[]>({
+    ruta: "/api/proyectos",
+    accessToken,
+    contexto: "consultar los proyectos",
+    signal: opciones.signal,
+    timeoutMs: opciones.timeoutMs,
+    validarData: validarLista,
+  })
+    .catch((error: unknown) => {
+      throw comoErrorProyectos(error);
+    })
+    .finally(() => {
       if (solicitudesEnCurso.get(clave) === solicitud) {
         solicitudesEnCurso.delete(clave);
       }
-    }
-  );
+    });
 
   if (!opciones.signal) {
     solicitudesEnCurso.set(clave, solicitud);
   }
 
   return solicitud;
+}
+
+export async function obtenerProyectoApi(
+  id: number,
+  accessToken: string,
+  opciones: OpcionesConsulta = {}
+): Promise<ProyectoApi> {
+  validarId(id);
+
+  try {
+    return await solicitarApi<ProyectoApi>({
+      ruta: `/api/proyectos/${id}`,
+      accessToken,
+      contexto: `consultar el proyecto ${id}`,
+      signal: opciones.signal,
+      timeoutMs: opciones.timeoutMs,
+      validarData: validarProyecto,
+    });
+  } catch (error) {
+    throw comoErrorProyectos(error);
+  }
+}
+
+export async function crearProyectoApi(
+  datos: ProyectoSolicitud,
+  accessToken: string,
+  opciones: OpcionesConsulta = {}
+): Promise<ProyectoApi> {
+  const cuerpo = validarSolicitud(datos);
+
+  try {
+    return await solicitarApi<ProyectoApi>({
+      ruta: "/api/proyectos",
+      accessToken,
+      contexto: "crear el proyecto",
+      metodo: "POST",
+      cuerpo,
+      signal: opciones.signal,
+      timeoutMs: opciones.timeoutMs,
+      validarData: validarProyecto,
+    });
+  } catch (error) {
+    throw comoErrorProyectos(error);
+  }
+}
+
+export async function actualizarProyectoApi(
+  id: number,
+  datos: ProyectoSolicitud,
+  accessToken: string,
+  opciones: OpcionesConsulta = {}
+): Promise<ProyectoApi> {
+  validarId(id);
+  const cuerpo = validarSolicitud(datos);
+
+  try {
+    return await solicitarApi<ProyectoApi>({
+      ruta: `/api/proyectos/${id}`,
+      accessToken,
+      contexto: `actualizar el proyecto ${id}`,
+      metodo: "PUT",
+      cuerpo,
+      signal: opciones.signal,
+      timeoutMs: opciones.timeoutMs,
+      validarData: validarProyecto,
+    });
+  } catch (error) {
+    throw comoErrorProyectos(error);
+  }
+}
+
+export async function eliminarProyectoApi(
+  id: number,
+  accessToken: string,
+  opciones: OpcionesConsulta = {}
+): Promise<void> {
+  validarId(id);
+
+  try {
+    // DELETE devuelve 204 sin cuerpo; el cliente no interpreta JSON.
+    await solicitarApi<void>({
+      ruta: `/api/proyectos/${id}`,
+      accessToken,
+      contexto: `eliminar el proyecto ${id}`,
+      metodo: "DELETE",
+      signal: opciones.signal,
+      timeoutMs: opciones.timeoutMs,
+      permitirDataNula: true,
+    });
+  } catch (error) {
+    throw comoErrorProyectos(error);
+  }
 }

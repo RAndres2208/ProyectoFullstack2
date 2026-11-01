@@ -266,14 +266,13 @@ function App() {
             : AccesoDenegado
         }
       />
-      <Route
-        path="/administrador/usuarios"
-        component={
-          puedeAcceder("administrador")
-            ? UsuariosAdministrador
-            : AccesoDenegado
-        }
-      />
+      <Route path="/administrador/usuarios">
+        {puedeAcceder("administrador") ? (
+          <UsuariosAdministrador />
+        ) : (
+          <AccesoDenegado />
+        )}
+      </Route>
       <Route
         path="/administrador/roles"
         component={

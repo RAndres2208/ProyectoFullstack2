@@ -231,8 +231,7 @@ function TarjetaProyecto({
         {proyecto.origen === "api" ? (
           <span className={styles.participantes}>
             <span aria-hidden="true">♧</span>{" "}
-            <strong>{proyecto.participantes ?? "—"}</strong>{" "}
-            participantes
+            <strong>Cantidad no disponible</strong>
           </span>
         ) : (
           <span className={styles.eventos}>
@@ -286,7 +285,7 @@ export function Proyectos() {
         nombre: proyecto.nombre,
         estado: proyecto.estado,
         origen: "api",
-        participantes: proyecto.participantes,
+        participantes: null,
       })),
     [proyectos]
   );
@@ -527,8 +526,8 @@ export function Proyectos() {
 
                 {!modoDemo && (
                   <p className={ui.metaTexto}>
-                    La API entrega nombre, estado y participantes. Los
-                    campos que no están en el contrato no se inventan.
+                    La API entrega identificador, nombre, descripción y estado.
+                    No informa la cantidad de participantes.
                   </p>
                 )}
 

@@ -651,10 +651,10 @@ function ContenidoProyectoApi({
         />
         <TarjetaResumen
           etiqueta="Participantes"
-          valor={proyecto.participantes.toLocaleString("es-CL")}
-          detalle="Campo real de SyncPass API"
+          valor="No disponible"
+          detalle="La API de proyectos no entrega esta cantidad"
           icono="♧"
-          tono="exito"
+          tono="neutral"
         />
         <TarjetaResumen
           etiqueta="Estado API"
@@ -851,8 +851,8 @@ export function DetalleProyecto() {
   const proyectoApi =
     estadoApi === "exito" && esRutaNumerica
       ? proyectos.find(
-          (proyecto) => String(proyecto.id) === id
-        )
+        (proyecto) => String(proyecto.id) === id
+      )
       : undefined;
 
   const proyectoDemo = buscarDetalleProyectoDemo(
