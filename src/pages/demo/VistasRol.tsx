@@ -165,7 +165,7 @@ export function VistasRol({
         </Route>
         <Route path="/administrador/usuarios">
           {rol === "administrador" ? (
-            <UsuariosAdministrador />
+            <UsuariosAdministrador soloLectura />
           ) : (
             <Redirect to={inicio} />
           )}

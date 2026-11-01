@@ -1,4 +1,5 @@
 import { useAuth } from "react-oidc-context";
+import { cerrarSesionCognito } from "../../auth/cerrarSesionCognito";
 import { Redirect, useLocation } from "wouter";
 import {
   ORDEN_ROLES,
@@ -78,7 +79,7 @@ export function SeleccionRol() {
             <button
               type="button"
               className={styles.botonSecundario}
-              onClick={() => void auth.signoutRedirect()}
+              onClick={() => void cerrarSesionCognito(auth)}
             >
               Cerrar sesión
             </button>

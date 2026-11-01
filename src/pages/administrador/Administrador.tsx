@@ -1,21 +1,16 @@
-
 import { Link } from "wouter";
 import { useAuth } from "react-oidc-context";
 import { obtenerNombreUsuario, ORDEN_ROLES } from "../../auth/roles";
 import { PageLayout } from "../../components/page-layout/PageLayout";
-import {
-  Aviso,
-  AvisoDemo,
-  EstadoVacio,
-  Etiqueta,
-} from "../../components/ui/Ui";
+import { Aviso, AvisoDemo, EstadoVacio, Etiqueta } from "../../components/ui/Ui";
 import { cursosDemo, estudiantesDemo } from "../../data/cursosData";
+import { RegistroUsuarioAdmin } from "./RegistroUsuarioAdmin";
 import dashboardStyles from "../dashboard/Dashboard.module.css";
 
 const modulos = [
   {
     nombre: "Usuarios",
-    descripcion: "Consulta y administración de cuentas institucionales",
+    descripcion: "Registro de cuentas institucionales y estado de la gestión de usuarios",
     icono: "👤",
     ruta: "/administrador/usuarios",
   },
@@ -40,26 +35,11 @@ const modulos = [
 ];
 
 const estadoModulos = [
-  {
-    modulo: "Registro administrativo de usuarios",
-    estado: "Pendiente de integrar formulario",
-  },
-  {
-    modulo: "Listado de usuarios",
-    estado: "Sin endpoint",
-  },
-  {
-    modulo: "Modificación o baja de cuentas",
-    estado: "Sin endpoint",
-  },
-  {
-    modulo: "Asignación de roles a cuentas existentes",
-    estado: "Sin endpoint",
-  },
-  {
-    modulo: "Configuración general",
-    estado: "Sin endpoint",
-  },
+  { modulo: "Registro administrativo de usuarios", estado: "Formulario implementado; pendiente de prueba con Cognito" },
+  { modulo: "Listado de usuarios", estado: "Sin endpoint" },
+  { modulo: "Modificación o baja de cuentas", estado: "Sin endpoint" },
+  { modulo: "Asignación de roles a cuentas existentes", estado: "Sin endpoint" },
+  { modulo: "Configuración general", estado: "Sin endpoint" },
 ];
 
 export function DashboardAdministrador() {
@@ -75,12 +55,8 @@ export function DashboardAdministrador() {
     >
       <section className={dashboardStyles.welcome}>
         <div>
-          <p className={dashboardStyles.welcomeLabel}>
-            Bienvenido/a,
-          </p>
-          <h2 className={dashboardStyles.welcomeName}>
-            {nombre}
-          </h2>
+          <p className={dashboardStyles.welcomeLabel}>Bienvenido/a,</p>
+          <h2 className={dashboardStyles.welcomeName}>{nombre}</h2>
           <p className={dashboardStyles.welcomeSubtitle}>
             Administración de usuarios, roles, cursos y configuración
           </p>
@@ -88,54 +64,37 @@ export function DashboardAdministrador() {
       </section>
 
       <AvisoDemo>
-        Los indicadores de este panel son de demostración.
-        Los módulos administrativos indican cuáles tienen
-        integración disponible y cuáles continúan pendientes.
+        Los indicadores de este panel son de demostración. El formulario de registro
+        está implementado para sesiones administrativas reales, pero su funcionamiento
+        con Cognito y el backend desplegado aún debe verificarse.
       </AvisoDemo>
 
       <section className={dashboardStyles.stats}>
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>👥</div>
           <div>
-            <p className={dashboardStyles.statLabel}>
-              Usuarios de referencia
-            </p>
-            <p className={dashboardStyles.statValue}>
-              {estudiantesDemo.length}
-            </p>
+            <p className={dashboardStyles.statLabel}>Usuarios de referencia</p>
+            <p className={dashboardStyles.statValue}>{estudiantesDemo.length}</p>
           </div>
         </article>
-
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>🛡️</div>
           <div>
-            <p className={dashboardStyles.statLabel}>
-              Roles del sistema
-            </p>
-            <p className={dashboardStyles.statValue}>
-              {ORDEN_ROLES.length}
-            </p>
+            <p className={dashboardStyles.statLabel}>Roles del sistema</p>
+            <p className={dashboardStyles.statValue}>{ORDEN_ROLES.length}</p>
           </div>
         </article>
-
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>📚</div>
           <div>
-            <p className={dashboardStyles.statLabel}>
-              Cursos de referencia
-            </p>
-            <p className={dashboardStyles.statValue}>
-              {cursosDemo.length}
-            </p>
+            <p className={dashboardStyles.statLabel}>Cursos de referencia</p>
+            <p className={dashboardStyles.statValue}>{cursosDemo.length}</p>
           </div>
         </article>
-
         <article className={dashboardStyles.statCard}>
           <div className={dashboardStyles.statIcon}>⚙️</div>
           <div>
-            <p className={dashboardStyles.statLabel}>
-              Módulos por integrar
-            </p>
+            <p className={dashboardStyles.statLabel}>Módulos por integrar</p>
             <p className={dashboardStyles.statValue}>4</p>
           </div>
         </article>
@@ -145,25 +104,13 @@ export function DashboardAdministrador() {
         <header className={dashboardStyles.sectionHeader}>
           <div>
             <h3>Módulos de administración</h3>
-            <p>
-              Cada módulo indica claramente su estado de disponibilidad
-            </p>
+            <p>Cada módulo indica claramente su estado de disponibilidad</p>
           </div>
         </header>
-
         <div className={dashboardStyles.actionsGrid}>
           {modulos.map((modulo) => (
-            <Link
-              key={modulo.ruta}
-              href={modulo.ruta}
-              className={dashboardStyles.actionCard}
-            >
-              <span
-                className={dashboardStyles.actionIcon}
-                aria-hidden="true"
-              >
-                {modulo.icono}
-              </span>
+            <Link key={modulo.ruta} href={modulo.ruta} className={dashboardStyles.actionCard}>
+              <span className={dashboardStyles.actionIcon} aria-hidden="true">{modulo.icono}</span>
               <span>{modulo.nombre}</span>
               <small>{modulo.descripcion}</small>
             </Link>
@@ -175,29 +122,17 @@ export function DashboardAdministrador() {
         <header className={dashboardStyles.sectionHeader}>
           <div>
             <h3>Estado de integración</h3>
-            <p>
-              Contratos administrativos confirmados para el frontend
-            </p>
+            <p>Contratos administrativos confirmados para el frontend</p>
           </div>
         </header>
-
         <div className={dashboardStyles.tableWrapper}>
           <table className={dashboardStyles.table}>
-            <thead>
-              <tr>
-                <th>Funcionalidad</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Funcionalidad</th><th>Estado</th></tr></thead>
             <tbody>
               {estadoModulos.map((item) => (
                 <tr key={item.modulo}>
                   <td>{item.modulo}</td>
-                  <td>
-                    <Etiqueta tono="advertencia">
-                      {item.estado}
-                    </Etiqueta>
-                  </td>
+                  <td><Etiqueta tono="advertencia">{item.estado}</Etiqueta></td>
                 </tr>
               ))}
             </tbody>
@@ -205,12 +140,11 @@ export function DashboardAdministrador() {
         </div>
       </section>
 
-      <Aviso tono="advertencia">
-        <strong>Registro de usuarios:</strong> el backend dispone de
-        POST /api/auth/registro, reservado a Administrador.
-        La interfaz de registro todavía está pendiente de integración.
-        No existen endpoints confirmados para listar, modificar
-        o eliminar cuentas existentes.
+      <Aviso tono="info">
+        <strong>Registro de usuarios:</strong> el backend expone POST /api/auth/registro,
+        reservado al grupo ADMINISTRADOR. El formulario está implementado, pero aún no
+        se ha validado su funcionamiento con el servidor real. No existen endpoints
+        confirmados para listar, modificar o eliminar cuentas existentes.
       </Aviso>
     </PageLayout>
   );
@@ -223,12 +157,7 @@ type ModuloPendienteProps = {
   motivo: string;
 };
 
-function ModuloPendiente({
-  titulo,
-  descripcion,
-  detalle,
-  motivo,
-}: ModuloPendienteProps) {
+function ModuloPendiente({ titulo, descripcion, detalle, motivo }: ModuloPendienteProps) {
   return (
     <PageLayout
       titulo={titulo}
@@ -238,20 +167,14 @@ function ModuloPendiente({
       demo="DUOC UC · ADMINISTRACIÓN"
     >
       <Aviso tono="advertencia">
-        <strong>Módulo pendiente de integración.</strong>{" "}
-        {motivo}
+        <strong>Módulo pendiente de integración.</strong> {motivo}
       </Aviso>
-
       <section className={dashboardStyles.section}>
-        <EstadoVacio
-          titulo="Sin operaciones disponibles"
-          descripcion={detalle}
-        />
+        <EstadoVacio titulo="Sin operaciones disponibles" descripcion={detalle} />
       </section>
-
       <Aviso tono="info">
-        No se muestran formularios ni botones de guardado
-        para evitar simular acciones que no llegarían a la API.
+        No se muestran formularios ni botones de guardado para evitar simular
+        acciones que no llegarían a la API.
       </Aviso>
     </PageLayout>
   );
@@ -261,9 +184,7 @@ type UsuariosAdministradorProps = {
   soloLectura?: boolean;
 };
 
-export function UsuariosAdministrador({
-  soloLectura = false,
-}: UsuariosAdministradorProps) {
+export function UsuariosAdministrador({ soloLectura = false }: UsuariosAdministradorProps) {
   if (soloLectura) {
     return (
       <ModuloPendiente
@@ -276,12 +197,19 @@ export function UsuariosAdministrador({
   }
 
   return (
-    <ModuloPendiente
+    <PageLayout
       titulo="Gestión de usuarios"
-      descripcion="Administración de cuentas institucionales"
-      motivo="El registro administrativo está disponible en el backend, pero el formulario todavía no se encuentra integrado."
-      detalle="La API permite crear cuentas mediante POST /api/auth/registro. El listado, la modificación y la eliminación de cuentas siguen pendientes porque no existen endpoints confirmados."
-    />
+      descripcion="Registro de cuentas institucionales"
+      volverA="/administrador/dashboard"
+      rol="◈ Administrador"
+      demo="DUOC UC · ADMINISTRACIÓN"
+    >
+      <Aviso tono="info">
+        El registro requiere una sesión auténtica de Cognito con el grupo ADMINISTRADOR.
+        La API todavía no dispone de endpoints para listar, modificar o eliminar cuentas.
+      </Aviso>
+      <RegistroUsuarioAdmin />
+    </PageLayout>
   );
 }
 

@@ -1,15 +1,11 @@
+
 /**
- * Cliente HTTP del registro administrativo de usuarios.
+ * Cliente HTTP del registro administrativo de usuarios de SyncPass.
  *
- * Contrato confirmado:
- * - POST {VITE_API_URL}/api/auth/registro
- * - Requiere rol ADMINISTRADOR (validado por el backend).
+ * Endpoint: POST /api/auth/registro
+ * Permiso requerido en el backend: ADMINISTRADOR.
  *
- * Solicitud:
- * { email, password (8-64), nombre (máx. 100), roles }
- *
- * La API solo confirma el alta. No existen endpoints confirmados para
- * listar, editar o eliminar cuentas, por lo que este servicio no los crea.
+ * No implementa listado, edición ni eliminación de cuentas.
  */
 
 import {
@@ -31,10 +27,21 @@ export type RegistroAdministrativoSolicitud = {
   roles: RolRegistro[];
 };
 
+export type UsuarioRegistrado = {
+  id: string;
+  email: string;
+  nombre: string;
+  roles: RolRegistro[];
+};
+
 export type TipoErrorRegistro = TipoErrorApi;
 
 export class ErrorRegistro extends ErrorApi {
-  constructor(tipo: TipoErrorRegistro, mensaje: string, status?: number) {
+  constructor(
+    tipo: TipoErrorRegistro,
+    mensaje: string,
+    status?: number
+  ) {
     super(tipo, mensaje, status);
     this.name = "ErrorRegistro";
   }
@@ -49,13 +56,38 @@ export const ROLES_REGISTRO: RolRegistro[] = [
 
 const PATRON_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-function comoErrorRegistro(error: unknown): ErrorRegistro {
+function esObjeto(
+  valor: unknown
+): valor is Record<string, unknown> {
+  return (
+    typeof valor === "object" &&
+    valor !== null &&
+    !Array.isArray(valor)
+  );
+}
+
+function esRolRegistro(
+  valor: unknown
+): valor is RolRegistro {
+  return (
+    typeof valor === "string" &&
+    ROLES_REGISTRO.some((rol) => rol === valor)
+  );
+}
+
+function comoErrorRegistro(
+  error: unknown
+): ErrorRegistro {
   if (error instanceof ErrorRegistro) {
     return error;
   }
 
   if (error instanceof ErrorApi) {
-    return new ErrorRegistro(error.tipo, error.message, error.status);
+    return new ErrorRegistro(
+      error.tipo,
+      error.message,
+      error.status
+    );
   }
 
   return new ErrorRegistro(
@@ -64,6 +96,9 @@ function comoErrorRegistro(error: unknown): ErrorRegistro {
   );
 }
 
+/**
+ * Valida la solicitud antes de enviarla.
+ */
 export function validarRegistroAdministrativo(
   datos: RegistroAdministrativoSolicitud
 ): RegistroAdministrativoSolicitud {
@@ -79,7 +114,10 @@ export function validarRegistroAdministrativo(
     );
   }
 
-  if (password.length < 8 || password.length > 64) {
+  if (
+    password.length < 8 ||
+    password.length > 64
+  ) {
     throw new ErrorRegistro(
       "solicitud",
       "La contraseña debe tener entre 8 y 64 caracteres."
@@ -100,32 +138,113 @@ export function validarRegistroAdministrativo(
     );
   }
 
-  if (roles.some((rol) => !ROLES_REGISTRO.includes(rol))) {
+  if (!roles.every(esRolRegistro)) {
     throw new ErrorRegistro(
       "solicitud",
       "Los roles permitidos son ESTUDIANTE, PROFESOR, COORDINADOR y ADMINISTRADOR."
     );
   }
 
-  return { email, password, nombre, roles };
+  return {
+    email,
+    password,
+    nombre,
+    roles,
+  };
 }
 
 /**
- * Crea una cuenta mediante el endpoint administrativo.
- * La contraseña solo viaja en el cuerpo de la solicitud y nunca se registra.
+ * Comprueba que la respuesta corresponde al UsuarioResponse
+ * definido por el backend.
+ *
+ * No recibe ni devuelve contraseñas.
+ */
+export function validarUsuarioRegistrado(
+  valor: unknown
+): UsuarioRegistrado {
+  if (!esObjeto(valor)) {
+    throw new ErrorRegistro(
+      "respuesta",
+      "La API devolvió un usuario con un formato inesperado."
+    );
+  }
+
+  const { id, email, nombre, roles } = valor;
+
+  if (
+    typeof id !== "string" ||
+    !id.trim()
+  ) {
+    throw new ErrorRegistro(
+      "respuesta",
+      "La respuesta no contiene un identificador de usuario válido."
+    );
+  }
+
+  if (
+    typeof email !== "string" ||
+    !PATRON_EMAIL.test(email.trim())
+  ) {
+    throw new ErrorRegistro(
+      "respuesta",
+      "La respuesta contiene un correo electrónico inválido."
+    );
+  }
+
+  if (
+    typeof nombre !== "string" ||
+    !nombre.trim()
+  ) {
+    throw new ErrorRegistro(
+      "respuesta",
+      "La respuesta no contiene un nombre válido."
+    );
+  }
+
+  if (
+    !Array.isArray(roles) ||
+    roles.length === 0 ||
+    !roles.every(esRolRegistro)
+  ) {
+    throw new ErrorRegistro(
+      "respuesta",
+      "La respuesta contiene roles desconocidos o inválidos."
+    );
+  }
+
+  return {
+    id: id.trim(),
+    email: email.trim(),
+    nombre: nombre.trim(),
+    roles: Array.from(new Set(roles as RolRegistro[])),
+  };
+}
+
+type OpcionesRegistro = {
+  signal?: AbortSignal;
+  timeoutMs?: number;
+};
+
+/**
+ * Registra un usuario mediante el backend.
+ *
+ * El backend debe validar:
+ * - JWT de Cognito.
+ * - Pertenencia al grupo ADMINISTRADOR.
+ * - Permisos para asignar los roles solicitados.
+ *
+ * La contraseña nunca se registra en consola
+ * ni se devuelve en UsuarioRegistrado.
  */
 export async function registrarUsuarioAdministrativoApi(
   datos: RegistroAdministrativoSolicitud,
   accessToken: string,
-  opciones: {
-    signal?: AbortSignal;
-    timeoutMs?: number;
-  } = {}
-): Promise<void> {
+  opciones: OpcionesRegistro = {}
+): Promise<UsuarioRegistrado> {
   const cuerpo = validarRegistroAdministrativo(datos);
 
   try {
-    await solicitarApi<void>({
+    return await solicitarApi<UsuarioRegistrado>({
       ruta: "/api/auth/registro",
       accessToken,
       contexto: "registrar el usuario",
@@ -133,8 +252,7 @@ export async function registrarUsuarioAdministrativoApi(
       cuerpo,
       signal: opciones.signal,
       timeoutMs: opciones.timeoutMs,
-      // El alta puede responder data null; solo se exige success === true.
-      permitirDataNula: true,
+      validarData: validarUsuarioRegistrado,
     });
   } catch (error) {
     throw comoErrorRegistro(error);

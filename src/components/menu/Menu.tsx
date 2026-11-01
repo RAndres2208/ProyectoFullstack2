@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cerrarSesionCognito } from "../../auth/cerrarSesionCognito";
 import { useAuth } from "react-oidc-context";
 import { Link, useLocation } from "wouter";
 import { useDemoRole } from "../../auth/demoRole";
@@ -381,7 +382,7 @@ export function Menu() {
             <button
               type="button"
               className={styles.footerButton}
-              onClick={() => void auth.signoutRedirect()}
+              onClick={() => void cerrarSesionCognito(auth)}
             >
               Cerrar sesión
             </button>

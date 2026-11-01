@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cerrarSesionCognito } from "../../auth/cerrarSesionCognito";
 import { useAuth } from "react-oidc-context";
 import { PageLayout } from "../../components/page-layout/PageLayout";
 import {
@@ -120,7 +121,7 @@ export function Perfil() {
     setMostrarAlternativa(false);
 
     try {
-      await auth.signoutRedirect();
+      await cerrarSesionCognito(auth);
     } catch {
       setErrorCierre(
         "Cognito no completó el cierre de sesión remoto. Puedes quitar la sesión guardada en este navegador."
