@@ -179,6 +179,20 @@ function construirGrupos(
           label: "Usuarios",
           icon: "👤",
         },
+        ...(esReal
+          ? [
+              {
+                href: "/administrador/proyectos",
+                label: "Proyectos",
+                icon: "▤",
+              },
+              {
+                href: "/administrador/participantes",
+                label: "Participantes",
+                icon: "👥",
+              },
+            ]
+          : []),
         {
           href: "/administrador/roles",
           label: "Roles",

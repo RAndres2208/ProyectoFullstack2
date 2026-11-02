@@ -16,6 +16,7 @@ import {
   RolesAdministrador,
   UsuariosAdministrador,
 } from "./pages/administrador/Administrador";
+import { ProyectosAdministrador } from "./pages/administrador/ProyectosAdministrador";
 import { AsistenciaCoordinador } from "./pages/coordinador/AsistenciaCoordinador";
 import { CursosCoordinador } from "./pages/coordinador/CursosCoordinador";
 import { DashboardCoordinador } from "./pages/coordinador/DashboardCoordinador";
@@ -37,6 +38,7 @@ import { Historial } from "./pages/historial/Historial";
 import { Login } from "./pages/login/Login";
 import { ModoOffline } from "./pages/offline/ModoOffline";
 import { Participantes } from "./pages/participantes/Participantes";
+import { ParticipantesAdmin } from "./pages/participantes/ParticipantesAdmin";
 import { Perfil } from "./pages/perfil/Perfil";
 import { Proyectos } from "./pages/proyectos/Proyectos";
 import { DetalleProyecto } from "./pages/proyectos/DetalleProyecto";
@@ -294,6 +296,22 @@ function App() {
         component={
           puedeAcceder("administrador")
             ? ConfiguracionAdministrador
+            : AccesoDenegado
+        }
+      />
+      <Route
+        path="/administrador/proyectos"
+        component={
+          puedeAcceder("administrador")
+            ? ProyectosAdministrador
+            : AccesoDenegado
+        }
+      />
+      <Route
+        path="/administrador/participantes"
+        component={
+          puedeAcceder("administrador")
+            ? ParticipantesAdmin
             : AccesoDenegado
         }
       />

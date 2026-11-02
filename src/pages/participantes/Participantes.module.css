@@ -81,3 +81,14 @@
     grid-column: auto;
   }
 }
+
+/* Vista administrativa conectada a la API: búsqueda + proyecto. */
+.filtrosAdmin {
+  grid-template-columns: minmax(220px, 2fr) minmax(160px, 1fr);
+}
+
+@media (max-width: 760px) {
+  .filtrosAdmin {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

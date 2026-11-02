@@ -32,6 +32,12 @@ const modulos = [
     icono: "⚙️",
     ruta: "/administrador/configuracion",
   },
+  {
+    nombre: "Proyectos",
+    descripcion: "Gestión de proyectos del sistema (API)",
+    icono: "▤",
+    ruta: "/administrador/proyectos",
+  },
 ];
 
 const estadoModulos = [
