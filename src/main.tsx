@@ -12,6 +12,7 @@ import App from "./App.tsx";
 import { DemoRoleProvider } from "./auth/demoRole";
 import { PerfilActivoProvider } from "./auth/perfilActivo";
 import { VistaPreviaProvider } from "./auth/vistaPrevia";
+import { AcademicoProvider } from "./context/AcademicoProvider";
 
 // Detecta si estamos ejecutando SyncPass en desarrollo.
 const isDev = import.meta.env.DEV;
@@ -69,7 +70,9 @@ createRoot(document.getElementById("root")!).render(
       <DemoRoleProvider>
         <PerfilActivoProvider>
           <VistaPreviaProvider>
-            <App />
+            <AcademicoProvider>
+              <App />
+            </AcademicoProvider>
           </VistaPreviaProvider>
         </PerfilActivoProvider>
       </DemoRoleProvider>

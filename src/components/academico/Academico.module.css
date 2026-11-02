@@ -1,0 +1,195 @@
+/* Estilos compartidos de los módulos académicos en demostración. */
+
+.filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.formularioGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.campoCompleto {
+  grid-column: 1 / -1;
+}
+
+.metaFila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.codigo {
+  display: inline-flex;
+  padding: 3px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body, Arial, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.listaInscritos {
+  display: grid;
+  gap: 8px;
+  max-height: 330px;
+  overflow-y: auto;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itemInscrito {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.itemInscrito strong {
+  display: block;
+  font-size: 14px;
+}
+
+.itemInscrito span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.progresoAsistencia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 14px 0 16px;
+}
+
+.contadorAsistencia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+  font-size: 13px;
+}
+
+.contadorAsistencia strong {
+  font-size: 18px;
+}
+
+.selectorEstado {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.opcionEstado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 5px 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.opcionEstado:hover {
+  border-color: var(--color-brand-accent);
+  color: var(--color-brand-primary);
+}
+
+.opcionEstado:focus-within {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.radioOculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.opcionPresente {
+  background: var(--color-success-bg);
+  border-color: var(--color-success-border);
+  color: var(--color-success);
+}
+
+.opcionAtrasado {
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning-border);
+  color: var(--color-warning);
+}
+
+.opcionAusente {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+.celdaAsistencia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.celdaAsistenciaInfo {
+  min-width: 0;
+}
+
+.celdaAsistenciaInfo strong {
+  display: block;
+  font-size: 14px;
+}
+
+.celdaAsistenciaInfo span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .filtros,
+  .formularioGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .campoCompleto {
+    grid-column: auto;
+  }
+
+  .itemInscrito {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

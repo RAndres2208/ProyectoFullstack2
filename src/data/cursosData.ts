@@ -1,12 +1,6 @@
-export type Curso = {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  docente: string;
-  codigo: string;
-  estado: "Activo" | "Inactivo" | "Finalizado";
-  estudiantes: number;
-};
+import type { Curso, Estudiante } from "../types/academico";
+
+export type { Curso, Estudiante } from "../types/academico";
 
 export const cursosDemo: Curso[] = [
   {
@@ -14,6 +8,7 @@ export const cursosDemo: Curso[] = [
     nombre: "Taller de Programación Web",
     descripcion: "Desarrollo frontend con React y TypeScript",
     docente: "María González",
+    docenteId: "DOC-001",
     codigo: "PW-2024-01",
     estado: "Activo",
     estudiantes: 28
@@ -23,6 +18,7 @@ export const cursosDemo: Curso[] = [
     nombre: "Bases de Datos",
     descripcion: "Modelado relacional y SQL",
     docente: "Carlos Pérez",
+    docenteId: "DOC-002",
     codigo: "BD-2024-01",
     estado: "Activo",
     estudiantes: 32
@@ -32,13 +28,14 @@ export const cursosDemo: Curso[] = [
     nombre: "Metodologías Ágiles",
     descripcion: "Scrum, Kanban y gestión de proyectos",
     docente: "Ana Torres",
+    docenteId: "DOC-003",
     codigo: "AG-2024-01",
     estado: "Finalizado",
     estudiantes: 25
   }
 ];
 
-export const estudiantesDemo = [
+export const estudiantesDemo: Estudiante[] = [
   {
     id: "EST-001",
     nombre: "Juan Pérez",

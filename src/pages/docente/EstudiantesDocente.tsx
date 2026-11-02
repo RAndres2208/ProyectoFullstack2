@@ -1,43 +1,231 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useAuth } from "react-oidc-context";
 import { PageLayout } from "../../components/page-layout/PageLayout";
-import { estudiantesDemo } from "../../data/cursosData";
+import {
+  Aviso,
+  AvisoDemo,
+  Buscador,
+  EstadoVacio,
+  Etiqueta,
+} from "../../components/ui/Ui";
+import ui from "../../components/ui/Ui.module.css";
+import { useAcademico } from "../../context/AcademicoContext";
+import { normalizarTexto } from "../../utils/format";
+import { resolverDocenteActivo } from "../../utils/academico";
+import styles from "../dashboard/Dashboard.module.css";
+import academicoStyles from "../../components/academico/Academico.module.css";
 
 export function EstudiantesDocente() {
-  const [estudiantes] = useState(estudiantesDemo);
+  const auth = useAuth();
+  const { cursos, docentes, estudiantes, obtenerEstudiantesDeCurso } =
+    useAcademico();
+
   const [busqueda, setBusqueda] = useState("");
-  const estudiantesFiltrados = estudiantes.filter(e => 
-    e.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    e.email.toLowerCase().includes(busqueda.toLowerCase())
+  const [filtroCurso, setFiltroCurso] = useState("Todos");
+
+  const { docente, vinculado } = useMemo(
+    () => resolverDocenteActivo(auth.user?.profile, docentes),
+    [auth.user?.profile, docentes]
   );
 
+  const cursosVisibles = useMemo(() => {
+    if (!docente) {
+      return cursos;
+    }
+
+    return cursos.filter((curso) => curso.docenteId === docente.id);
+  }, [cursos, docente]);
+
+  const estudiantesConCursos = useMemo(() => {
+    const cursosPorEstudiante = new Map<string, string[]>();
+
+    for (const curso of cursosVisibles) {
+      for (const estudiante of obtenerEstudiantesDeCurso(curso.id)) {
+        const cursosActuales = cursosPorEstudiante.get(estudiante.id) ?? [];
+        cursosActuales.push(curso.nombre);
+        cursosPorEstudiante.set(estudiante.id, cursosActuales);
+      }
+    }
+
+    return estudiantes
+      .filter((estudiante) => cursosPorEstudiante.has(estudiante.id))
+      .map((estudiante) => ({
+        ...estudiante,
+        cursosInscritos: cursosPorEstudiante.get(estudiante.id) ?? [],
+      }));
+  }, [cursosVisibles, estudiantes, obtenerEstudiantesDeCurso]);
+
+  const estudiantesFiltrados = useMemo(() => {
+    const texto = normalizarTexto(busqueda);
+    const cursoSeleccionado = cursosVisibles.find(
+      (curso) => curso.id === filtroCurso
+    );
+
+    return estudiantesConCursos.filter((estudiante) => {
+      const coincideCurso =
+        filtroCurso === "Todos" ||
+        (cursoSeleccionado
+          ? estudiante.cursosInscritos.includes(cursoSeleccionado.nombre)
+          : false);
+
+      if (!coincideCurso) {
+        return false;
+      }
+
+      if (!texto) {
+        return true;
+      }
+
+      return normalizarTexto(
+        `${estudiante.nombre} ${estudiante.email} ${estudiante.carrera} ${estudiante.cursosInscritos.join(" ")}`
+      ).includes(texto);
+    });
+  }, [busqueda, cursosVisibles, estudiantesConCursos, filtroCurso]);
+
+  function limpiarFiltros() {
+    setBusqueda("");
+    setFiltroCurso("Todos");
+  }
+
   return (
-    <PageLayout titulo="Mantenedor de Estudiantes" descripcion="Gestión académica - Modo demostración" volverA="/docente/dashboard" rol="◈ Docente" demo="DUOC UC · DEMO">
-      <div style={{display:"flex",gap:"1rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
-        <input type="search" placeholder="Buscar por nombre o email..." value={busqueda} onChange={(e)=>setBusqueda(e.target.value)} style={{flex:"1",minWidth:"200px",padding:"0.75rem",borderRadius:"0.5rem",border:"1px solid #ddd"}}/>
-      </div>
-      <div style={{background:"#fff",borderRadius:"0.75rem",overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,0.05)"}}>
-        <table style={{width:"100%",borderCollapse:"collapse"}}>
-          <thead style={{background:"#f8f9fa"}}>
-            <tr>
-              <th style={{padding:"1rem",textAlign:"left",borderBottom:"2px solid #dee2e6"}}>Nombre</th>
-              <th style={{padding:"1rem",textAlign:"left",borderBottom:"2px solid #dee2e6"}}>Email</th>
-              <th style={{padding:"1rem",textAlign:"left",borderBottom:"2px solid #dee2e6"}}>Carrera</th>
-              <th style={{padding:"1rem",textAlign:"left",borderBottom:"2px solid #dee2e6"}}>Cursos</th>
-            </tr>
-          </thead>
-          <tbody>
-            {estudiantesFiltrados.map(est => (
-              <tr key={est.id} style={{borderBottom:"1px solid #f1f1f1"}}>
-                <td style={{padding:"1rem"}}>{est.nombre}</td>
-                <td style={{padding:"1rem"}}>{est.email}</td>
-                <td style={{padding:"1rem"}}>{est.carrera}</td>
-                <td style={{padding:"1rem"}}>{est.cursos.length}</td>
-              </tr>
+    <PageLayout
+      titulo="Estudiantes del docente"
+      descripcion="Estudiantes inscritos en tus cursos · Modo demostración"
+      volverA="/docente/dashboard"
+      rol="◈ Docente"
+      demo="DUOC UC · DEMO"
+    >
+      <AvisoDemo>
+        Las inscripciones son de demostración y viven solo en la memoria de esta
+        sesión. La API todavía no expone un endpoint de matrículas.
+      </AvisoDemo>
+
+      {vinculado && docente ? (
+        <Aviso tono="info">
+          Sesión vinculada con <strong>{docente.nombre}</strong>. El listado se
+          limita a los estudiantes inscritos en sus cursos asignados.
+        </Aviso>
+      ) : (
+        <Aviso tono="advertencia">
+          No fue posible vincular tu sesión de Cognito con una ficha docente de
+          demostración. Se muestran los estudiantes de todos los cursos de
+          ejemplo.
+        </Aviso>
+      )}
+
+      <div className={academicoStyles.filtros}>
+        <Buscador
+          id="buscar-estudiantes-docente"
+          etiqueta="Buscar estudiantes por nombre, correo, carrera o curso"
+          valor={busqueda}
+          onChange={setBusqueda}
+          placeholder="Buscar por nombre, correo, carrera o curso..."
+        />
+
+        <div className={ui.campo}>
+          <label className={ui.campoEtiqueta} htmlFor="filtro-curso-estudiantes">
+            Curso
+          </label>
+          <select
+            id="filtro-curso-estudiantes"
+            value={filtroCurso}
+            onChange={(evento) => setFiltroCurso(evento.target.value)}
+          >
+            <option value="Todos">Todos los cursos</option>
+            {cursosVisibles.map((curso) => (
+              <option key={curso.id} value={curso.id}>
+                {curso.codigo} · {curso.nombre}
+              </option>
             ))}
-          </tbody>
-        </table>
+          </select>
+        </div>
       </div>
-      <p style={{marginTop:"1rem",color:"#666",fontSize:"0.875rem"}}>Datos de demostración - Segundo mantenedor web</p>
+
+      <div className={ui.resultadoCabecera}>
+        <p className={ui.resultadoConteo} role="status">
+          {estudiantesFiltrados.length}{" "}
+          {estudiantesFiltrados.length === 1
+            ? "estudiante encontrado"
+            : "estudiantes encontrados"}{" "}
+          de {estudiantesConCursos.length}
+        </p>
+
+        {(busqueda || filtroCurso !== "Todos") && (
+          <button
+            type="button"
+            className={`${ui.boton} ${ui.botonTexto} ${ui.botonPequeno}`}
+            onClick={limpiarFiltros}
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
+      {cursosVisibles.length === 0 ? (
+        <EstadoVacio
+          titulo="Sin cursos asignados"
+          descripcion="Cuando tengas cursos asignados, aquí aparecerán sus estudiantes inscritos."
+        />
+      ) : estudiantesConCursos.length === 0 ? (
+        <EstadoVacio
+          titulo="Sin estudiantes inscritos"
+          descripcion="Inscribe estudiantes desde la pantalla de cursos para verlos en este listado."
+        />
+      ) : estudiantesFiltrados.length === 0 ? (
+        <EstadoVacio
+          titulo="Sin estudiantes coincidentes"
+          descripcion="Ajusta la búsqueda o el filtro de curso para ver otros estudiantes."
+          accion={
+            <button
+              type="button"
+              className={`${ui.boton} ${ui.botonSecundario}`}
+              onClick={limpiarFiltros}
+            >
+              Limpiar filtros
+            </button>
+          }
+        />
+      ) : (
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Correo</th>
+                <th>Carrera</th>
+                <th>Cursos en tu ámbito</th>
+              </tr>
+            </thead>
+            <tbody>
+              {estudiantesFiltrados.map((estudiante) => (
+                <tr key={estudiante.id}>
+                  <td>
+                    <strong>{estudiante.nombre}</strong>
+                  </td>
+                  <td>{estudiante.email}</td>
+                  <td>{estudiante.carrera}</td>
+                  <td>
+                    <Etiqueta tono="info">
+                      {estudiante.cursosInscritos.length}{" "}
+                      {estudiante.cursosInscritos.length === 1
+                        ? "curso"
+                        : "cursos"}
+                    </Etiqueta>
+                    <p className={ui.metaTexto}>
+                      {estudiante.cursosInscritos.join(" · ")}
+                    </p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <p className={ui.metaTexto} style={{ marginTop: 14 }}>
+        Datos de demostración. La matrícula real se habilitará cuando el backend
+        publique el contrato de inscripciones académicas.
+      </p>
     </PageLayout>
   );
 }
