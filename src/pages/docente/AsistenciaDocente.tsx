@@ -1,3 +1,6 @@
+import { useDemoRole } from "../../auth/demoRole";
+import { useVistaPrevia } from "../../auth/vistaPrevia";
+import { AsistenciaDocenteApi } from "./AsistenciaDocenteApi";
 import { useMemo, useState, type FormEvent } from "react";
 import { useAuth } from "react-oidc-context";
 import { PageLayout } from "../../components/page-layout/PageLayout";
@@ -50,7 +53,7 @@ function claseOpcion(estado: EstadoAsistencia) {
   return academicoStyles.opcionAusente;
 }
 
-export function AsistenciaDocente() {
+function AsistenciaDocenteDemo() {
   const auth = useAuth();
   const {
     cursos,
@@ -549,4 +552,15 @@ function estudianteCursoIncluye(
   return estudiantesCurso.some(
     (estudiante) => estudiante.id === estudianteId
   );
+}
+
+/** Las vistas demo nunca llaman a Spring Boot. */
+export function AsistenciaDocente() {
+  const auth = useAuth();
+  const { esModoDemo } = useDemoRole();
+  const { activo: vistaPreviaActiva } = useVistaPrevia();
+  const esReal = auth.isAuthenticated && !esModoDemo && !vistaPreviaActiva;
+  return esReal
+    ? <AsistenciaDocenteApi token={auth.user?.access_token ?? ""} sub={auth.user?.profile.sub ?? ""} />
+    : <AsistenciaDocenteDemo />;
 }

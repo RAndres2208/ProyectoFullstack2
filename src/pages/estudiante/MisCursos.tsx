@@ -1,3 +1,6 @@
+import { useDemoRole } from "../../auth/demoRole";
+import { useVistaPrevia } from "../../auth/vistaPrevia";
+import { MisCursosApi } from "./MisCursosApi";
 import { useMemo } from "react";
 import { useAuth } from "react-oidc-context";
 import { PageLayout } from "../../components/page-layout/PageLayout";
@@ -11,7 +14,7 @@ import { useAcademico } from "../../context/AcademicoContext";
 import { resolverEstudianteActivo } from "../../utils/academico";
 import styles from "../dashboard/Dashboard.module.css";
 
-export function MisCursos() {
+function MisCursosDemo() {
   const auth = useAuth();
   const { estudiantes, listarCursosPorPerfil } = useAcademico();
 
@@ -105,4 +108,15 @@ export function MisCursos() {
       </section>
     </PageLayout>
   );
+}
+
+/** Las vistas demo nunca llaman a Spring Boot. */
+export function MisCursos() {
+  const auth = useAuth();
+  const { esModoDemo } = useDemoRole();
+  const { activo: vistaPreviaActiva } = useVistaPrevia();
+  const esReal = auth.isAuthenticated && !esModoDemo && !vistaPreviaActiva;
+  return esReal
+    ? <MisCursosApi token={auth.user?.access_token ?? ""} sub={auth.user?.profile.sub ?? ""} />
+    : <MisCursosDemo />;
 }

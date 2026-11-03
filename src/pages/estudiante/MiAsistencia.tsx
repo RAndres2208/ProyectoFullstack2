@@ -1,3 +1,6 @@
+import { useDemoRole } from "../../auth/demoRole";
+import { useVistaPrevia } from "../../auth/vistaPrevia";
+import { MiAsistenciaApi } from "./MiAsistenciaApi";
 import { useMemo } from "react";
 import { useAuth } from "react-oidc-context";
 import { PageLayout } from "../../components/page-layout/PageLayout";
@@ -26,7 +29,7 @@ function tonoAsistencia(estado: EstadoAsistencia) {
   return "peligro" as const;
 }
 
-export function MiAsistencia() {
+function MiAsistenciaDemo() {
   const auth = useAuth();
   const nombre = obtenerNombreUsuario(auth.user?.profile);
   const {
@@ -194,4 +197,15 @@ export function MiAsistencia() {
       </section>
     </PageLayout>
   );
+}
+
+/** Las vistas demo nunca llaman a Spring Boot. */
+export function MiAsistencia() {
+  const auth = useAuth();
+  const { esModoDemo } = useDemoRole();
+  const { activo: vistaPreviaActiva } = useVistaPrevia();
+  const esReal = auth.isAuthenticated && !esModoDemo && !vistaPreviaActiva;
+  return esReal
+    ? <MiAsistenciaApi token={auth.user?.access_token ?? ""} sub={auth.user?.profile.sub ?? ""} />
+    : <MiAsistenciaDemo />;
 }
