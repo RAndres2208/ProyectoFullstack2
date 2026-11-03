@@ -1,18 +1,14 @@
 /**
  * Contratos de integración académica de SyncPass.
  *
- * IMPORTANTE:
- * - El backend todavía no confirma endpoints para cursos, docentes,
- *   inscripciones ni asistencia.
- * - Este módulo NO contiene rutas HTTP, ni clientes `fetch`, ni respuestas
- *   inventadas. Solo declara los tipos y las operaciones que deberá implementar
- *   el servicio real cuando exista un contrato aprobado.
- * - Las pantallas actuales trabajan con datos de demostración en memoria a
- *   través de `AcademicoProvider`.
- *
- * Cuando el backend publique el contrato, se debe crear un servicio que
- * implemente `ContratoAcademico` usando `apiClient.ts` y reemplazar el estado
- * en memoria sin cambiar las pantallas.
+ * Estado actual:
+ * - Cursos y docentes de coordinación ya se conectan a la API real mediante
+ *   `src/services/academicoApi.ts` y `src/hooks/useAcademicoApi.ts`.
+ * - Inscripciones y asistencia continúan en memoria a través de
+ *   `AcademicoProvider`; este módulo declara la forma que tendría su
+ *   integración futura.
+ * - No inventar rutas ni respuestas: el cliente real vive en
+ *   `academicoApi.ts` y usa `apiClient.ts`.
  */
 
 import type {
@@ -52,13 +48,15 @@ export type ContratoAcademico = {
 };
 
 /**
- * Estado explícito de la integración. Las pantallas lo usan para no presentar
- * los cambios en memoria como si estuvieran persistidos en PostgreSQL.
+ * Estado explícito de la integración. Las pantallas de coordinación usan la
+ * API real para cursos y docentes; inscripciones y asistencia permanecen en
+ * memoria. El valor de `asistencia` conserva "pendiente" para que
+ * `AcademicoProvider` siga marcando esa integración como no disponible.
  */
 export const INTEGRACION_ACADEMICA = {
-  cursos: "pendiente",
-  docentes: "pendiente",
-  inscripciones: "pendiente",
+  cursos: "api-coordinador",
+  docentes: "api-coordinador",
+  inscripciones: "demo-local",
   asistencia: "pendiente",
-  persistencia: "memoria-demo",
+  persistencia: "mixta-api-memoria",
 } as const;

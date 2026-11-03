@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   Aviso,
   Buscador,
@@ -12,13 +12,35 @@ import {
   ESTADOS_CURSO,
   type Curso,
   type CursoSolicitud,
+  type DocenteAcademico,
+  type EstudianteAcademico,
   type EstadoCurso,
 } from "../../types/academico";
 import { normalizarTexto } from "../../utils/format";
 import styles from "./Academico.module.css";
 
-type GestionCursosProps = {
+/**
+ * Controlador opcional para las pantallas de coordinación conectadas a la API.
+ * Cuando se entrega, `GestionCursos` deja de usar cursos/docentes locales.
+ * La eliminación no se expone porque el backend no publica DELETE de cursos.
+ */
+export type ControladorCursosApi = {
   cursos: Curso[];
+  docentes: DocenteAcademico[];
+  cargando: boolean;
+  error: string | null;
+  onReintentar: () => void;
+  crearCurso: (datos: CursoSolicitud) => Promise<Curso>;
+  actualizarCurso: (id: string, datos: CursoSolicitud) => Promise<Curso>;
+  listarEstudiantes: () => Promise<EstudianteAcademico[]>;
+  listarEstudiantesDeCurso: (cursoId: string) => Promise<EstudianteAcademico[]>;
+  inscribirEstudiante: (cursoId: string, estudianteId: string) => Promise<void>;
+  retirarEstudiante: (cursoId: string, estudianteId: string) => Promise<void>;
+};
+
+type GestionCursosProps = {
+  cursos?: Curso[];
+  api?: ControladorCursosApi;
   puedeGestionar: boolean;
   docentePredeterminadoId?: string | null;
   titulo?: string;
@@ -58,28 +80,35 @@ function tonoEstadoCurso(estado: EstadoCurso) {
 }
 
 export function GestionCursos({
-  cursos,
+  cursos: cursosProp,
+  api,
   puedeGestionar,
   docentePredeterminadoId = null,
   titulo = "Cursos del ámbito",
   descripcion = "Crea cursos, asigna docentes e inscribe estudiantes.",
 }: GestionCursosProps) {
   const {
-    cursos: todosLosCursos,
-    docentes,
+    cursos: cursosContexto,
+    docentes: docentesContexto,
     estudiantes,
     obtenerEstudiantesDeCurso,
-    crearCurso,
-    actualizarCurso,
+    crearCurso: crearCursoLocal,
+    actualizarCurso: actualizarCursoLocal,
     eliminarCurso,
     inscribirEstudiante,
     retirarEstudiante,
   } = useAcademico();
 
+  const cursosDemo = cursosProp ?? [];
+  const cursosFuente = api ? api.cursos : cursosDemo;
+  const docentes = api ? api.docentes : docentesContexto;
+  const todosLosCursos = api ? api.cursos : cursosContexto;
+
   const [busqueda, setBusqueda] = useState("");
   const [filtroDocente, setFiltroDocente] = useState("Todos");
   const [mensaje, setMensaje] = useState("");
   const [errorOperacion, setErrorOperacion] = useState("");
+  const [guardando, setGuardando] = useState(false);
 
   const docenteFijo = useMemo(
     () =>
@@ -106,11 +135,17 @@ export function GestionCursos({
   const [cursoEliminando, setCursoEliminando] = useState<Curso | null>(null);
   const [cursoInscripcion, setCursoInscripcion] = useState<Curso | null>(null);
   const [busquedaEstudiante, setBusquedaEstudiante] = useState("");
+  const [estudiantesApi, setEstudiantesApi] = useState<EstudianteAcademico[]>([]);
+  const [inscritosApi, setInscritosApi] = useState<EstudianteAcademico[]>([]);
+  const [cargandoEstudiantesApi, setCargandoEstudiantesApi] = useState(false);
+  const [cargandoInscritosApi, setCargandoInscritosApi] = useState(false);
+  const [errorInscripcionApi, setErrorInscripcionApi] = useState("");
+  const [operacionPendiente, setOperacionPendiente] = useState<string | null>(null);
 
   const filtrados = useMemo(() => {
     const texto = normalizarTexto(busqueda);
 
-    return cursos.filter((curso) => {
+    return cursosFuente.filter((curso) => {
       const contenido = normalizarTexto(
         `${curso.nombre} ${curso.codigo} ${curso.docente}`
       );
@@ -120,14 +155,16 @@ export function GestionCursos({
 
       return coincideTexto && coincideDocente;
     });
-  }, [busqueda, cursos, filtroDocente]);
+  }, [busqueda, cursosFuente, filtroDocente]);
 
   const inscritos = useMemo(
     () =>
-      cursoInscripcion
-        ? obtenerEstudiantesDeCurso(cursoInscripcion.id)
-        : [],
-    [cursoInscripcion, obtenerEstudiantesDeCurso]
+      api
+        ? inscritosApi
+        : cursoInscripcion
+          ? obtenerEstudiantesDeCurso(cursoInscripcion.id)
+          : [],
+    [api, inscritosApi, cursoInscripcion, obtenerEstudiantesDeCurso]
   );
 
   const idsInscritos = useMemo(
@@ -135,10 +172,12 @@ export function GestionCursos({
     [inscritos]
   );
 
+  const listaEstudiantes = api ? estudiantesApi : estudiantes;
+
   const estudiantesFiltrados = useMemo(() => {
     const texto = normalizarTexto(busquedaEstudiante);
 
-    return estudiantes.filter((estudiante) => {
+    return listaEstudiantes.filter((estudiante) => {
       if (!texto) {
         return true;
       }
@@ -147,7 +186,49 @@ export function GestionCursos({
         `${estudiante.nombre} ${estudiante.email} ${estudiante.carrera}`
       ).includes(texto);
     });
-  }, [busquedaEstudiante, estudiantes]);
+  }, [busquedaEstudiante, listaEstudiantes]);
+
+  useEffect(() => {
+    if (!cursoInscripcion) {
+      return;
+    }
+
+    if (!api) {
+      return;
+    }
+
+    let cancelado = false;
+    setCargandoEstudiantesApi(true);
+    setCargandoInscritosApi(true);
+    setErrorInscripcionApi("");
+
+    Promise.all([
+      api.listarEstudiantes(),
+      api.listarEstudiantesDeCurso(cursoInscripcion.id),
+    ])
+      .then(([estudiantes, inscritos]) => {
+        if (cancelado) return;
+        setEstudiantesApi(estudiantes);
+        setInscritosApi(inscritos);
+      })
+      .catch((fallo: unknown) => {
+        if (cancelado) return;
+        setErrorInscripcionApi(
+          fallo instanceof Error
+            ? fallo.message
+            : "No fue posible consultar estudiantes."
+        );
+      })
+      .finally(() => {
+        if (cancelado) return;
+        setCargandoEstudiantesApi(false);
+        setCargandoInscritosApi(false);
+      });
+
+    return () => {
+      cancelado = true;
+    };
+  }, [api, cursoInscripcion]);
 
   function limpiarFiltros() {
     setBusqueda("");
@@ -210,7 +291,9 @@ export function GestionCursos({
       );
 
       if (repetido) {
-        errores.codigo = "Ya existe un curso de demostración con este código.";
+        errores.codigo = api
+          ? "Ya existe un curso con este código en SyncPass."
+          : "Ya existe un curso de demostración con este código.";
       }
     }
 
@@ -226,7 +309,7 @@ export function GestionCursos({
     return errores;
   }
 
-  function guardarCurso(evento: FormEvent<HTMLFormElement>) {
+  async function guardarCurso(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
 
     if (!puedeGestionar) {
@@ -251,9 +334,22 @@ export function GestionCursos({
       docenteId: docenteFijo ? docenteFijo.id : formulario.docenteId || null,
     };
 
+    setGuardando(true);
+    setErrorOperacion("");
+
     try {
-      if (cursoEditando) {
-        const actualizado = actualizarCurso(cursoEditando.id, datos);
+      if (api) {
+        const guardado = cursoEditando
+          ? await api.actualizarCurso(cursoEditando.id, datos)
+          : await api.crearCurso(datos);
+
+        setMensaje(
+          `Curso "${guardado.nombre}" ${
+            cursoEditando ? "actualizado" : "creado"
+          } en PostgreSQL mediante SyncPass API.`
+        );
+      } else if (cursoEditando) {
+        const actualizado = actualizarCursoLocal(cursoEditando.id, datos);
 
         if (!actualizado) {
           throw new Error("El curso ya no existe en la demostración.");
@@ -263,7 +359,7 @@ export function GestionCursos({
           `Curso "${actualizado.nombre}" actualizado en la memoria de esta sesión.`
         );
       } else {
-        const creado = crearCurso(datos);
+        const creado = crearCursoLocal(datos);
         setMensaje(
           `Curso "${creado.nombre}" creado en la memoria de esta sesión.`
         );
@@ -277,13 +373,23 @@ export function GestionCursos({
       setErrorOperacion(
         fallo instanceof Error
           ? fallo.message
-          : "No fue posible guardar el curso de demostración."
+          : "No fue posible guardar el curso."
       );
+    } finally {
+      setGuardando(false);
     }
   }
 
   function confirmarEliminacion() {
     if (!cursoEliminando) {
+      return;
+    }
+
+    if (api) {
+      setCursoEliminando(null);
+      setErrorOperacion(
+        "La API de SyncPass no publica un endpoint para eliminar cursos."
+      );
       return;
     }
 
@@ -300,8 +406,54 @@ export function GestionCursos({
     setMensaje(`Curso "${nombre}" eliminado de la memoria de esta sesión.`);
   }
 
-  function alternarInscripcion(estudianteId: string) {
+  async function alternarInscripcion(estudianteId: string) {
     if (!cursoInscripcion || !puedeGestionar) {
+      return;
+    }
+
+    if (api) {
+      if (operacionPendiente) {
+        return;
+      }
+
+      const estabaInscrito = idsInscritos.has(estudianteId);
+      setOperacionPendiente(estudianteId);
+      setErrorInscripcionApi("");
+
+      try {
+        if (estabaInscrito) {
+          await api.retirarEstudiante(cursoInscripcion.id, estudianteId);
+          setInscritosApi((actuales) =>
+            actuales.filter((estudiante) => estudiante.id !== estudianteId)
+          );
+        } else {
+          await api.inscribirEstudiante(cursoInscripcion.id, estudianteId);
+          setInscritosApi((actuales) => {
+            if (actuales.some((estudiante) => estudiante.id === estudianteId)) {
+              return actuales;
+            }
+            const estudiante = estudiantesApi.find(
+              (item) => item.id === estudianteId
+            );
+            return estudiante ? [...actuales, estudiante] : actuales;
+          });
+        }
+
+        setMensaje(
+          estabaInscrito
+            ? "Estudiante retirado del curso en SyncPass API."
+            : "Estudiante inscrito en el curso en SyncPass API."
+        );
+      } catch (fallo) {
+        setErrorInscripcionApi(
+          fallo instanceof Error
+            ? fallo.message
+            : "No fue posible actualizar la inscripción."
+        );
+      } finally {
+        setOperacionPendiente(null);
+      }
+
       return;
     }
 
@@ -320,30 +472,67 @@ export function GestionCursos({
     }
   }
 
+  const cabeceraPanel = (
+    <div className={ui.panelCabecera}>
+      <div>
+        <h2 id="gestion-cursos-titulo" className={ui.panelTitulo}>
+          {titulo}
+        </h2>
+        <p className={ui.panelDescripcion}>{descripcion}</p>
+      </div>
+
+      <div className={ui.botonesFila}>
+        <span className={ui.metaTexto}>
+          {cursosFuente.length}{" "}
+          {cursosFuente.length === 1 ? "curso" : "cursos"}
+        </span>
+        <button
+          type="button"
+          className={`${ui.boton} ${ui.botonPrimario}`}
+          onClick={abrirNuevo}
+          disabled={!puedeGestionar || Boolean(api?.error)}
+        >
+          + Nuevo curso
+        </button>
+      </div>
+    </div>
+  );
+
+  if (api?.cargando) {
+    return (
+      <section className={ui.panel} aria-labelledby="gestion-cursos-titulo">
+        {cabeceraPanel}
+        <EstadoVacio
+          titulo="Cargando cursos y docentes"
+          descripcion="Consultando GET /api/cursos y GET /api/docentes con tu sesión de Cognito."
+        />
+      </section>
+    );
+  }
+
+  if (api?.error) {
+    return (
+      <section className={ui.panel} aria-labelledby="gestion-cursos-titulo">
+        {cabeceraPanel}
+        <Aviso tono="peligro">
+          <strong>No fue posible cargar los cursos.</strong> {api.error}
+          <div className={ui.botonesFila} style={{ marginTop: 12 }}>
+            <button
+              type="button"
+              className={`${ui.boton} ${ui.botonSecundario} ${ui.botonPequeno}`}
+              onClick={api.onReintentar}
+            >
+              Reintentar
+            </button>
+          </div>
+        </Aviso>
+      </section>
+    );
+  }
+
   return (
     <section className={ui.panel} aria-labelledby="gestion-cursos-titulo">
-      <div className={ui.panelCabecera}>
-        <div>
-          <h2 id="gestion-cursos-titulo" className={ui.panelTitulo}>
-            {titulo}
-          </h2>
-          <p className={ui.panelDescripcion}>{descripcion}</p>
-        </div>
-
-        <div className={ui.botonesFila}>
-          <span className={ui.metaTexto}>
-            {cursos.length} {cursos.length === 1 ? "curso" : "cursos"}
-          </span>
-          <button
-            type="button"
-            className={`${ui.boton} ${ui.botonPrimario}`}
-            onClick={abrirNuevo}
-            disabled={!puedeGestionar}
-          >
-            + Nuevo curso
-          </button>
-        </div>
-      </div>
+      {cabeceraPanel}
 
       {mensaje && <Aviso tono="exito">{mensaje}</Aviso>}
       {errorOperacion && !formularioAbierto && (
@@ -389,7 +578,7 @@ export function GestionCursos({
         <p className={ui.resultadoConteo} role="status">
           {filtrados.length}{" "}
           {filtrados.length === 1 ? "curso encontrado" : "cursos encontrados"} de{" "}
-          {cursos.length}
+          {cursosFuente.length}
         </p>
 
         {(busqueda || filtroDocente !== "Todos") && (
@@ -403,10 +592,14 @@ export function GestionCursos({
         )}
       </div>
 
-      {cursos.length === 0 ? (
+      {cursosFuente.length === 0 ? (
         <EstadoVacio
           titulo="Sin cursos registrados"
-          descripcion="Crea un curso de demostración para comenzar a asignar docentes e inscribir estudiantes."
+          descripcion={
+            api
+              ? "La API de SyncPass no devolvió cursos. Crea el primero para asignarle docentes."
+              : "Crea un curso de demostración para comenzar a asignar docentes e inscribir estudiantes."
+          }
           accion={
             puedeGestionar ? (
               <button
@@ -437,7 +630,9 @@ export function GestionCursos({
         <div className={ui.tablaWrap}>
           <table className={ui.tabla}>
             <caption className={ui.srOnly}>
-              Cursos de demostración con docente, inscritos y estado
+              {api
+                ? "Cursos de SyncPass con docente, estudiantes y estado"
+                : "Cursos de demostración con docente, inscritos y estado"}
             </caption>
             <thead>
               <tr>
@@ -493,7 +688,12 @@ export function GestionCursos({
                           setErrorOperacion("");
                           setCursoEliminando(curso);
                         }}
-                        disabled={!puedeGestionar}
+                        disabled={!puedeGestionar || Boolean(api)}
+                        title={
+                          api
+                            ? "La API de SyncPass no publica eliminación de cursos."
+                            : undefined
+                        }
                       >
                         Eliminar
                       </button>
@@ -507,9 +707,9 @@ export function GestionCursos({
       )}
 
       <p className={ui.metaTexto} style={{ marginTop: 14 }}>
-        Los cambios se mantienen solo en la memoria de esta sesión. No se
-        envían a PostgreSQL ni a la API: el backend todavía no publica un
-        contrato académico.
+        {api
+          ? "Los cursos y docentes se consultan y guardan en PostgreSQL mediante SyncPass API. La eliminación no está disponible porque el backend no publica DELETE /api/cursos/{id}."
+          : "Los cambios se mantienen solo en la memoria de esta vista de demostración; no se envían a la API ni a PostgreSQL."}
       </p>
 
       <Modal
@@ -529,9 +729,13 @@ export function GestionCursos({
               type="submit"
               form="form-curso-academico"
               className={`${ui.boton} ${ui.botonPrimario}`}
-              disabled={!puedeGestionar}
+              disabled={!puedeGestionar || guardando}
             >
-              {cursoEditando ? "Guardar cambios" : "Crear curso"}
+              {guardando
+                ? "Guardando..."
+                : cursoEditando
+                  ? "Guardar cambios"
+                  : "Crear curso"}
             </button>
           </>
         }
@@ -714,16 +918,18 @@ export function GestionCursos({
           </div>
 
           <p className={ui.metaTexto} style={{ marginTop: 12 }}>
-            El curso se guarda solo en la demostración de esta sesión.
+            {api
+              ? "El curso se guarda en PostgreSQL mediante POST/PUT /api/cursos."
+              : "El curso se guarda solo en la demostración de esta sesión."}
           </p>
         </form>
       </Modal>
 
       <Modal
         abierto={Boolean(cursoInscripcion)}
-        titulo={`Estudiantes inscritos${
-          cursoInscripcion ? ` · ${cursoInscripcion.nombre}` : ""
-        }`}
+        titulo={`${
+          api ? "Inscripción local de demostración" : "Estudiantes inscritos"
+        }${cursoInscripcion ? ` · ${cursoInscripcion.nombre}` : ""}`}
         onCerrar={() => setCursoInscripcion(null)}
         amplio
         pie={
@@ -739,16 +945,34 @@ export function GestionCursos({
         {cursoInscripcion && (
           <>
             <Aviso tono="info">
-              Inscripción de demostración: se guarda solo en la memoria de esta
-              sesión. La API no dispone todavía de un endpoint de inscripciones.
+              {api
+                ? "Inscripción real: los cambios se envían a SyncPass API (POST/DELETE /api/cursos/{id}/estudiantes) y actualizan PostgreSQL."
+                : "Inscripción de demostración: se guarda solo en la memoria de esta vista y no está conectada a la API de SyncPass."}
             </Aviso>
+
+            {errorInscripcionApi && (
+              <Aviso tono="peligro">{errorInscripcionApi}</Aviso>
+            )}
 
             <p className={ui.textoSuave}>
               <strong>{inscritos.length}</strong>{" "}
-              {inscritos.length === 1 ? "estudiante inscrito" : "estudiantes inscritos"}{" "}
+              {api
+                ? inscritos.length === 1
+                  ? "estudiante inscrito"
+                  : "estudiantes inscritos"
+                : inscritos.length === 1
+                  ? "estudiante inscrito"
+                  : "estudiantes inscritos"}{" "}
               · Docente: <strong>{cursoInscripcion.docente}</strong>
             </p>
 
+            {api && (cargandoEstudiantesApi || cargandoInscritosApi) ? (
+              <EstadoVacio
+                titulo="Cargando estudiantes"
+                descripcion="Consultando GET /api/estudiantes y GET /api/cursos/{id}/estudiantes con tu sesión de Cognito."
+              />
+            ) : (
+              <>
             <Buscador
               id="buscar-estudiante-inscripcion"
               etiqueta="Buscar estudiantes para inscribir"
@@ -781,22 +1005,30 @@ export function GestionCursos({
                         className={`${ui.boton} ${
                           estaInscrito ? ui.botonPeligro : ui.botonSecundario
                         } ${ui.botonPequeno}`}
-                        onClick={() => alternarInscripcion(estudiante.id)}
-                        disabled={!puedeGestionar}
+                        onClick={() => void alternarInscripcion(estudiante.id)}
+                        disabled={
+                          !puedeGestionar || operacionPendiente !== null
+                        }
                       >
-                        {estaInscrito ? "Retirar" : "Inscribir"}
+                        {operacionPendiente === estudiante.id
+                          ? "Procesando..."
+                          : estaInscrito
+                            ? "Retirar"
+                            : "Inscribir"}
                       </button>
                     </li>
                   );
                 })}
               </ul>
             )}
+              </>
+            )}
           </>
         )}
       </Modal>
 
       <Modal
-        abierto={Boolean(cursoEliminando)}
+        abierto={!api && Boolean(cursoEliminando)}
         titulo="Eliminar curso"
         onCerrar={() => setCursoEliminando(null)}
         pie={

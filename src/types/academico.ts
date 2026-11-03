@@ -2,9 +2,10 @@
  * Tipos académicos compartidos por las pantallas de cursos, docentes,
  * estudiantes y asistencia.
  *
- * En esta etapa los datos son de demostración y viven en memoria. Los tipos
- * están preparados para recibir un contrato real cuando el backend publique
- * los endpoints académicos (ver `src/services/academicoContratos.ts`).
+ * Las pantallas de coordinación de cursos y docentes usan la API real
+ * (`src/services/academicoApi.ts`) cuando hay una sesión de Cognito. Los
+ * flujos de inscripción, asistencia y las vistas de demostración continúan
+ * usando datos en memoria.
  */
 
 export type EstadoCurso = "Activo" | "Inactivo" | "Finalizado";
@@ -36,7 +37,7 @@ export type Curso = {
   /** Vínculo interno con la ficha docente. */
   docenteId: string | null;
   estado: EstadoCurso;
-  /** Cantidad de estudiantes inscritos en los datos de demostración. */
+  /** Cantidad de estudiantes reportada por la API o calculada en demo. */
   estudiantes: number;
 };
 
