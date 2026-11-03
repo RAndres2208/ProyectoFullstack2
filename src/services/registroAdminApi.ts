@@ -1,4 +1,3 @@
-
 /**
  * Cliente HTTP del registro administrativo de usuarios de SyncPass.
  *
@@ -24,6 +23,7 @@ export type RegistroAdministrativoSolicitud = {
   email: string;
   password: string;
   nombre: string;
+  phoneNumber: string;
   roles: RolRegistro[];
 };
 
@@ -55,6 +55,7 @@ export const ROLES_REGISTRO: RolRegistro[] = [
 ];
 
 const PATRON_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PATRON_TELEFONO = /^\+[1-9]\d{1,14}$/;
 
 function esObjeto(
   valor: unknown
@@ -105,6 +106,7 @@ export function validarRegistroAdministrativo(
   const email = datos.email.trim().toLowerCase();
   const nombre = datos.nombre.trim();
   const password = datos.password;
+  const phoneNumber = datos.phoneNumber.trim();
   const roles = Array.from(new Set(datos.roles));
 
   if (!PATRON_EMAIL.test(email)) {
@@ -131,6 +133,13 @@ export function validarRegistroAdministrativo(
     );
   }
 
+  if (!PATRON_TELEFONO.test(phoneNumber)) {
+    throw new ErrorRegistro(
+      "solicitud",
+      "Ingresa un teléfono en formato internacional E.164, por ejemplo +56912345678."
+    );
+  }
+
   if (roles.length === 0) {
     throw new ErrorRegistro(
       "solicitud",
@@ -149,6 +158,7 @@ export function validarRegistroAdministrativo(
     email,
     password,
     nombre,
+    phoneNumber,
     roles,
   };
 }

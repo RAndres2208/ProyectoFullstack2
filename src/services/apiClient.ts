@@ -203,7 +203,57 @@ export async function solicitarApi<T>({
     });
 
     if (!respuesta.ok) {
-      throw errorPorEstado(respuesta.status, contexto);
+      const errorBase = errorPorEstado(
+        respuesta.status,
+        contexto
+      );
+
+      let mensajeBackend: string | null = null;
+
+      try {
+        const errorJson: unknown = await respuesta.json();
+
+        if (esObjeto(errorJson)) {
+          const mensaje =
+            typeof errorJson.mensaje === "string"
+              ? errorJson.mensaje
+              : typeof errorJson.message === "string"
+                ? errorJson.message
+                : null;
+
+          const codigo =
+            typeof errorJson.error === "string"
+              ? errorJson.error
+              : null;
+
+          const detalles = esObjeto(errorJson.detalles)
+            ? Object.entries(errorJson.detalles)
+                .filter(
+                  (entrada): entrada is [string, string] =>
+                    typeof entrada[1] === "string"
+                )
+                .map(([campo, valor]) => `${campo}: ${valor}`)
+                .join("; ")
+            : "";
+
+          if (mensaje) {
+            mensajeBackend = [
+              codigo,
+              mensaje,
+              detalles
+            ].filter(Boolean).join(" - ");
+          }
+        }
+      } catch {
+        // Mantener mensaje genérico si la respuesta
+        // del servidor no contiene JSON válido.
+      }
+
+      throw new ErrorApi(
+        errorBase.tipo,
+        mensajeBackend ?? errorBase.message,
+        respuesta.status
+      );
     }
 
     // DELETE responde 204 sin cuerpo: no se interpreta como JSON.

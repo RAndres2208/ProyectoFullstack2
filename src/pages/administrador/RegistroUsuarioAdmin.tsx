@@ -1,4 +1,3 @@
-
 import { useMemo, useRef, useState } from "react";
 import { useAuth } from "react-oidc-context";
 
@@ -60,6 +59,7 @@ export function RegistroUsuarioAdmin() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [roles, setRoles] = useState<RolRegistro[]>([
     "ESTUDIANTE",
   ]);
@@ -113,6 +113,7 @@ export function RegistroUsuarioAdmin() {
         nombre,
         email,
         password,
+        phoneNumber,
         roles,
       });
     } catch (fallo) {
@@ -145,6 +146,7 @@ export function RegistroUsuarioAdmin() {
       setNombre("");
       setEmail("");
       setPassword("");
+      setPhoneNumber("");
       setRoles(["ESTUDIANTE"]);
     } catch (fallo) {
       setError(
@@ -218,6 +220,21 @@ export function RegistroUsuarioAdmin() {
             required
             disabled={cargando}
             autoComplete="new-password"
+          />
+        </label>
+
+        <label className={styles.campo}>
+          Teléfono móvil (formato internacional)
+          <input
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="+56912345678"
+            pattern="\+[1-9][0-9]{1,14}"
+            title="Introduce el número con + y código de país, por ejemplo +56912345678"
+            required
+            disabled={cargando}
+            autoComplete="tel"
           />
         </label>
 
