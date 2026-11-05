@@ -52,7 +52,11 @@ function tieneGrupoAdministrador(token?: string): boolean {
   }
 }
 
-export function RegistroUsuarioAdmin() {
+export function RegistroUsuarioAdmin({
+  onUsuarioRegistrado,
+}: {
+  onUsuarioRegistrado?: (usuario: UsuarioRegistrado) => void;
+}) {
   const auth = useAuth();
   const enviandoRef = useRef(false);
 
@@ -143,6 +147,7 @@ export function RegistroUsuarioAdmin() {
         );
 
       setResultado(usuario);
+      onUsuarioRegistrado?.(usuario);
       setNombre("");
       setEmail("");
       setPassword("");

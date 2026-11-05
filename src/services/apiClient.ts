@@ -127,6 +127,11 @@ type OpcionesSolicitud<T> = {
   validarData?: (data: unknown) => T;
   /** Algunos endpoints administrativos pueden devolver data null. */
   permitirDataNula?: boolean;
+  /**
+   * Permite interpretar respuestas exitosas que no usan la envoltura
+   * ApiResponse<T>, por ejemplo DELETE con 200 y cuerpo propio.
+   */
+  leerRespuestaExitosa?: (respuesta: Response) => Promise<T>;
 };
 
 async function leerJson(respuesta: Response): Promise<unknown> {
@@ -154,6 +159,7 @@ export async function solicitarApi<T>({
   timeoutMs,
   validarData,
   permitirDataNula = false,
+  leerRespuestaExitosa,
 }: OpcionesSolicitud<T>): Promise<T> {
   if (!accessToken.trim()) {
     throw new ErrorApi(
@@ -259,6 +265,10 @@ export async function solicitarApi<T>({
     // DELETE responde 204 sin cuerpo: no se interpreta como JSON.
     if (respuesta.status === 204) {
       return undefined as T;
+    }
+
+    if (leerRespuestaExitosa) {
+      return await leerRespuestaExitosa(respuesta);
     }
 
     const json = await leerJson(respuesta);

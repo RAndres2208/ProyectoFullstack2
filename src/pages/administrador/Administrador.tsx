@@ -1,11 +1,33 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "react-oidc-context";
-import { obtenerNombreUsuario, ORDEN_ROLES } from "../../auth/roles";
+import {
+  decodificarClaimsAccessToken,
+  obtenerNombreUsuario,
+  ORDEN_ROLES,
+  useRoles,
+} from "../../auth/roles";
 import { PageLayout } from "../../components/page-layout/PageLayout";
 import { Aviso, AvisoDemo, EstadoVacio, Etiqueta } from "../../components/ui/Ui";
 import { cursosDemo, estudiantesDemo } from "../../data/cursosData";
+import { ListaUsuariosAdmin } from "./ListaUsuariosAdmin";
 import { RegistroUsuarioAdmin } from "./RegistroUsuarioAdmin";
 import dashboardStyles from "../dashboard/Dashboard.module.css";
+
+function valorTexto(
+  registro: unknown,
+  clave: string
+): string | undefined {
+  if (typeof registro !== "object" || registro === null) {
+    return undefined;
+  }
+
+  const valor = (registro as Record<string, unknown>)[clave];
+
+  return typeof valor === "string" && valor.trim()
+    ? valor.trim()
+    : undefined;
+}
 
 const modulos = [
   {
@@ -42,8 +64,10 @@ const modulos = [
 
 const estadoModulos = [
   { modulo: "Registro administrativo de usuarios", estado: "Formulario implementado; pendiente de prueba con Cognito" },
-  { modulo: "Listado de usuarios", estado: "Sin endpoint" },
-  { modulo: "Modificación o baja de cuentas", estado: "Sin endpoint" },
+  { modulo: "Listado de usuarios", estado: "GET /api/usuarios paginado y persistente" },
+  { modulo: "Consulta individual", estado: "GET /api/usuarios/{id} implementado" },
+  { modulo: "Baja de cuentas", estado: "DELETE /api/usuarios/{id} con refresco del listado" },
+  { modulo: "Modificación de cuentas", estado: "Sin endpoint" },
   { modulo: "Asignación de roles a cuentas existentes", estado: "Sin endpoint" },
   { modulo: "Configuración general", estado: "Sin endpoint" },
 ];
@@ -147,10 +171,11 @@ export function DashboardAdministrador() {
       </section>
 
       <Aviso tono="info">
-        <strong>Registro de usuarios:</strong> el backend expone POST /api/auth/registro,
-        reservado al grupo ADMINISTRADOR. El formulario está implementado, pero aún no
-        se ha validado su funcionamiento con el servidor real. No existen endpoints
-        confirmados para listar, modificar o eliminar cuentas existentes.
+        <strong>Usuarios:</strong> el backend expone GET /api/usuarios para el
+        listado paginado, GET /api/usuarios/&#123;id&#125; para la consulta
+        individual y DELETE /api/usuarios/&#123;id&#125; para la baja. Todas las
+        operaciones requieren ROLE_ADMINISTRADOR. La modificación de cuentas y
+        la reasignación de roles siguen sin endpoint confirmado.
       </Aviso>
     </PageLayout>
   );
@@ -191,6 +216,24 @@ type UsuariosAdministradorProps = {
 };
 
 export function UsuariosAdministrador({ soloLectura = false }: UsuariosAdministradorProps) {
+  const auth = useAuth();
+  const { roles } = useRoles();
+  const accessToken = auth.user?.access_token;
+  const claims = decodificarClaimsAccessToken(accessToken);
+  const perfil = auth.user?.profile;
+  const [versionLista, setVersionLista] = useState(0);
+
+  const autorizado = roles.includes("administrador");
+  const idUsuarioActivo =
+    valorTexto(claims, "sub") ?? valorTexto(perfil, "sub");
+  const emailUsuarioActivo =
+    valorTexto(claims, "email") ?? valorTexto(perfil, "email");
+
+  function manejarUsuarioRegistrado() {
+    // El alta ya ocurrió en el backend: se consulta nuevamente la API.
+    setVersionLista((actual) => actual + 1);
+  }
+
   if (soloLectura) {
     return (
       <ModuloPendiente
@@ -205,16 +248,26 @@ export function UsuariosAdministrador({ soloLectura = false }: UsuariosAdministr
   return (
     <PageLayout
       titulo="Gestión de usuarios"
-      descripcion="Registro de cuentas institucionales"
+      descripcion="Registro y baja de cuentas institucionales"
       volverA="/administrador/dashboard"
       rol="◈ Administrador"
       demo="DUOC UC · ADMINISTRACIÓN"
     >
       <Aviso tono="info">
-        El registro requiere una sesión auténtica de Cognito con el grupo ADMINISTRADOR.
-        La API todavía no dispone de endpoints para listar, modificar o eliminar cuentas.
+        El registro, el listado y la baja requieren una sesión auténtica de
+        Cognito con el grupo ADMINISTRADOR. El listado y la consulta individual
+        se obtienen desde PostgreSQL mediante la API; la baja se ejecuta con el
+        ID real del usuario y refresca la lista al confirmarse.
       </Aviso>
-      <RegistroUsuarioAdmin />
+      <RegistroUsuarioAdmin onUsuarioRegistrado={manejarUsuarioRegistrado} />
+      <ListaUsuariosAdmin
+        accessToken={accessToken}
+        autorizado={autorizado}
+        idUsuarioActivo={idUsuarioActivo}
+        emailUsuarioActivo={emailUsuarioActivo}
+        recargaExterna={versionLista}
+        onSesionExpirada={() => void auth.signinRedirect()}
+      />
     </PageLayout>
   );
 }
